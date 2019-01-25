@@ -1,0 +1,47 @@
+mxone_admin@LEIF1:~> trace -display
+ Version: 6.3.3.0.33, 16.3.3.0.33, Market: (1) standard
+ Trace ind:  0, State: started     , Stored:   5000, Size per lim: 5000
+ First: 2019-01-08 12:17:46 (CET) Last: 2019-01-25 20:13:05 (CET)
+
+ Trace ind:  1, State: started     , Stored:   5000, Size per lim: 5000
+ First: 2019-01-25 20:13:34 (CET) Last: 2019-01-25 20:17:39 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: all
+ Lim no   :   1, Unit no: 0298, Unit name: SIPLP
+ Time mark: 2018-12-13 16:46:19 (CET), by user: mxone_admin
+
+ Trace ind:  2, State: setup       , Stored:      0, Size per lim: 5000
+ Type     : unit-trace      , Rotating: on , Textlevel: all
+ Lim no   :   1, Unit no: 0302, Unit name: CSTServer
+ Time mark: 2018-12-13 16:46:05 (CET), by user: mxone_admin
+
+ Trace ind:  3, State: setup       , Stored:      0, Size per lim: 5000
+ Type     : unit-trace      , Rotating: on , Textlevel: all
+ Lim no   :   1, Unit no: 0206, Unit name: CMP
+ Time mark: 2018-12-13 16:46:11 (CET), by user: mxone_admin
+
+ Trace ind:  4, State: setup       , Stored:      0, Size per lim: 5000
+ Type     : unit-trace      , Rotating: on , Textlevel: all
+ Lim no   :   1, Unit no: 0216, Unit name: RMP
+ Time mark: 2018-12-13 16:46:14 (CET), by user: mxone_admin
+
+ Trace ind:  5, State: idle/free
+
+ Trace ind:  6, State: idle/free
+
+ Trace ind:  7, State: idle/free
+
+ Trace ind:  8, State: idle/free
+
+ Trace ind:  9, State: idle/free
+
+ Trace ind: 10, State: idle/free
+
+ Trace ind: 11, State: idle/free
+
+ Trace ind: 12, State: idle/free
+
+ Trace ind: 13, State: idle/free
+
+ Trace ind: 14, State: idle/free
+
+ Trace ind: 15, State: idle/free
