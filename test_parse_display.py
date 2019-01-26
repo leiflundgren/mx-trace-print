@@ -26,14 +26,18 @@ class TestStringMethods(unittest.TestCase):
         parser = ParseDisplayOutput(f)
 
         self.assertEqual('6.3.3.0.33, 16.3.3.0.33', parser.version)
-        self.assertEqual("1", parser.market)
+        self.assertEqual("(1) standard", parser.market)
+        self.assertEqual('2019-01-08 12:17:46 (CET)', parser.first_trace)
+        self.assertEqual('2019-01-25 20:13:05 (CET)', parser.last_trace)
+        individuals = parser.individuals
 
-        traces = parser.traces()
-
-        self.assertIsNone(traces[8])
-        self.assertEqual('1', traces[1].lim)
-        self.assertEqual('all', traces[1].textlevel)
-        self.assertEqual('SIPLP', traces[1].unitName)
+        id1= individuals[1]
+        self.assertEqual('1', id1.lim)
+        self.assertEqual('all', id1.textlevel)
+        self.assertEqual('SIPLP', id1.unit_name)
+        
+        id8 = individuals[8]
+        self.assertEqual('idle/free', id8.state)
 
 if __name__ == '__main__':
     unittest.main()
