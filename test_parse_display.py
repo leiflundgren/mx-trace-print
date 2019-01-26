@@ -1,5 +1,5 @@
 import unittest
-import parsers.parse_display
+from parse_display import ParseDisplayOutput
 
 class TestStringMethods(unittest.TestCase):
 
@@ -23,7 +23,7 @@ class TestStringMethods(unittest.TestCase):
 
     def test_parse_display(self):
         f = self.open_output1()
-        parser = parsers.ParseDisplayOutput(f)
+        parser = ParseDisplayOutput(f)
 
         self.assertEqual('6.3.3.0.33, 16.3.3.0.33', parser.version)
         self.assertEqual("1", parser.market)
