@@ -1,0 +1,75 @@
+mxone_admin@ts1:~> trace -display
+ Version: 7.0.0.2.5, 17.0.0.2.5, Market: (5) sweden
+ Trace ind:  0, State: started     , Stored:      8, Size per lim: 5000
+ First: 2019-01-07 11:07:51 (CET) Last: 2019-01-28 13:16:41 (CET)
+
+ Trace ind:  1, State: stopped     , Stored:   2907, Size per lim: 5000
+ First: 2019-01-22 16:16:00 (CET) Last: 2019-01-22 16:16:32 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0298, Unit name: SIPLP
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  2, State: stopped     , Stored:    174, Size per lim: 5000
+ First: 2019-01-22 16:16:02 (CET) Last: 2019-01-22 16:16:18 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0208, Unit name: IMP
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  3, State: stopped     , Stored:    431, Size per lim: 5000
+ First: 2019-01-22 16:16:01 (CET) Last: 2019-01-22 16:16:27 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0216, Unit name: RMP
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  4, State: stopped     , Stored:    281, Size per lim: 5000
+ First: 2019-01-22 16:16:02 (CET) Last: 2019-01-22 16:16:18 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0206, Unit name: CMP
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  5, State: stopped     , Stored:    156, Size per lim: 5000
+ First: 2019-01-22 16:16:01 (CET) Last: 2019-01-22 16:16:24 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0095, Unit name: DER
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  6, State: stopped     , Stored:     48, Size per lim: 5000
+ First: 2019-01-22 16:16:16 (CET) Last: 2019-01-22 16:16:18 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0228, Unit name: DTR
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  7, State: stopped     , Stored:    233, Size per lim: 5000
+ First: 2019-01-22 16:16:01 (CET) Last: 2019-01-22 16:16:26 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0302, Unit name: CSTServer
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  8, State: stopped     , Stored:     75, Size per lim: 5000
+ First: 2019-01-22 16:16:01 (CET) Last: 2019-01-22 16:16:19 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: normal
+ Lim no   :   1, Unit no: 0303, Unit name: ISUS
+ Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+ Trace ind:  9, State: idle/free
+
+ Trace ind: 10, State: idle/free
+
+ Trace ind: 11, State: idle/free
+
+ Trace ind: 12, State: idle/free
+
+ Trace ind: 13, State: idle/free
+
+ Trace ind: 14, State: idle/free
+
+ Trace ind: 15, State: idle/free
+
