@@ -6,49 +6,49 @@ class ParseDisplayOutput:
         def __init__(self, dict) -> None:
             self.dict = dict
 
-        def get(self, attrName):
+        def get(self, attrName) -> str:
             return self.dict[attrName].strip()
 
         @property
-        def id(self):
+        def id(self) -> str:
             return self.get('Trace ind')
 
         @property
-        def state(self):
+        def state(self) -> str:
             return self.get('State')
         @property
-        def stored(self):
+        def stored(self) -> str:
             return self.get('Stored')
         @property
-        def size(self):
+        def size(self) -> str:
             return self.get('Size per lim')
      
         @property
-        def trace_type(self):
+        def trace_type(self) -> str:
             return self.get('Type')
         @property
-        def rotating(self):
+        def rotating(self) -> str:
             return self.get('Rotating')
         @property
-        def textlevel(self):
+        def textlevel(self) -> str:
             return self.get('Textlevel')
         @property
-        def lim(self):
+        def lim(self) -> str:
             return self.get('Lim no')
         @property
-        def unit_no(self):
+        def unit_no(self) -> str:
             return self.get('Unit no')
         @property
-        def unit_name(self):
+        def unit_name(self) -> str:
             return self.get('Unit name')
         @property
-        def time_mark(self):
+        def time_mark(self) -> str:
             return self.get('Time mark')
         @property
-        def by_user(self):
+        def by_user(self) -> str:
             return self.get('by user')
         # @property
-        # def (self):
+        # def (self) -> str:
         #     return self.dict[''].strip()
                     
 
@@ -86,17 +86,17 @@ class ParseDisplayOutput:
                 parts = []
         
     @property
-    def first_trace(self):
+    def first_trace(self) -> str:
         return self.individuals[0].get('First')
     @property
-    def last_trace(self):
+    def last_trace(self) -> str:
         return self.individuals[0].get('Last')
 
-    def get_individual(self, id:str) -> ParseDisplayOutput.Individual:
+    def get_individual(self, id:str) -> 'Individual':
         return next((ind for ind in self.individuals if ind.id == id), None)
 
     ## Trace ind:  3, State: setup       , Stored:      0, Size per lim: 5000,  Type     : unit-trace      , Rotating: on , Textlevel: all, Lim no   :   1, Unit no: 0206, Unit name: CMP , Time mark: 2018-12-13 16:46:11 (CET), by user: mxone_admin
     @staticmethod
-    def parse_individual(parts) -> dict:
+    def parse_individual(parts) -> 'Individual':
         d = dict(map(str.strip, itm.split(':', 1)) for itm in parts)
         return ParseDisplayOutput.Individual(d) if len(d) > 0 else None

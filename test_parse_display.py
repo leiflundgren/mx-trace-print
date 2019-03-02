@@ -22,9 +22,9 @@ class TestStringMethods(unittest.TestCase):
             s.split(2)
 
     def test_parse_display(self):
-        f = self.open_output1()
-        parser = ParseDisplayOutput(f)
-
+        with self.open_output1() as f:
+            parser = ParseDisplayOutput(f)
+            
         self.assertEqual('6.3.3.0.33, 16.3.3.0.33', parser.version)
         self.assertEqual("(1) standard", parser.market)
         self.assertEqual('2019-01-08 12:17:46 (CET)', parser.first_trace)

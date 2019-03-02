@@ -1,0 +1,12 @@
+{
+    "gangs": [
+        {
+            "name": "usual",
+            "members": ["SIPLP", "RMP", "CMP"]
+        },
+        {
+            "name": "csta",
+            "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
+        }
+    ]
+}
