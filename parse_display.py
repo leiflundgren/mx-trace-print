@@ -1,14 +1,22 @@
-from typing import List, Optional
 import io
+from typing import List, Optional
+import tools
 
 class ParseDisplayOutput:
 
     class Individual:
         def __init__(self, dict) -> None:
             self.dict = dict
+        def __str__(self) -> str:
+            return "{id}: {name} {state}".format(id=self.id, name=self.unit_name, state=self.state)
 
         def get(self, attrName) -> str:
-            return self.dict[attrName].strip()
+            val = self.dict.get(attrName)
+            return ( None if val is None else val.strip() )
+
+        @property
+        def is_header(self) -> bool:
+            return self.dict.find('Version') is not None
 
         @property
         def id(self) -> str:
@@ -54,7 +62,7 @@ class ParseDisplayOutput:
                     
 
     def __init__(self, source) -> None:
-        self.source = self.read(source)
+        self.source = tools.read(source)
         self.individuals : List[ParseDisplayOutput.Individual] = [] 
         parts : List[str] = []
 
@@ -85,16 +93,7 @@ class ParseDisplayOutput:
                 if individual is not None:
                     self.individuals.append(individual)
                 parts = []
-    def read(self, file_thing) -> str:
-        if isinstance(file_thing, io.TextIOBase):
-            return file_thing.readlines()
-        if isinstance(file_thing, str):
-            if file_thing.count('\n') > 0:
-                return file_thing # list-thing
-            else:
-                with open(file_thing, "r", encoding='iso-8859-1') as f:
-                    return f.readlines()
-        raise ValueError("Cannot read data from " + str(type(file_thing)))
+
 
     @property
     def first_trace(self) -> str:
@@ -103,8 +102,13 @@ class ParseDisplayOutput:
     def last_trace(self) -> str:
         return self.individuals[0].get('Last')
 
-    def get_individual(self, id:str) -> 'Individual':
-        return next((ind for ind in self.individuals if ind.id == id), None)
+    def get_individual(self, id) -> 'Individual':
+        if isinstance(id, int):
+            return self.individuals[id] if id < len(self.individuals) else None
+        for ind in self.individuals[1:]: # Avoid header
+            if ind.id == id or ind.unit_name == id:
+                return ind
+        return None
 
     ## Trace ind:  3, State: setup       , Stored:      0, Size per lim: 5000,  Type     : unit-trace      , Rotating: on , Textlevel: all, Lim no   :   1, Unit no: 0206, Unit name: CMP , Time mark: 2018-12-13 16:46:11 (CET), by user: mxone_admin
     @staticmethod
