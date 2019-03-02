@@ -4,9 +4,11 @@ from command_generator import CommandGenerator
 
 class TestCommendGenerator(unittest.TestCase):
 
-    def setup(self):
+    def setUp(self):
+        with
         self.display = ParseDisplayOutput("trace-display.output")
         self.cmdgen = CommandGenerator(self.display.version)
+        print('setup done')
 
     def test_add_ISUS(self):
         isus =  self.display.get_individual('ISUS')

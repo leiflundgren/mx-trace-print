@@ -1,4 +1,5 @@
 from typing import List, Optional
+import io
 
 class ParseDisplayOutput:
 
@@ -53,7 +54,7 @@ class ParseDisplayOutput:
                     
 
     def __init__(self, source) -> None:
-        self.source = source
+        self.source = self.read(source)
         self.individuals : List[ParseDisplayOutput.Individual] = [] 
         parts : List[str] = []
 
@@ -84,7 +85,17 @@ class ParseDisplayOutput:
                 if individual is not None:
                     self.individuals.append(individual)
                 parts = []
-        
+    def read(self, file_thing) -> str:
+        if isinstance(file_thing, io.TextIOBase):
+            return file_thing.readlines()
+        if isinstance(file_thing, str):
+            if file_thing.count('\n') > 0:
+                return file_thing # list-thing
+            else:
+                with open(file_thing, "r", encoding='iso-8859-1') as f:
+                    return f.readlines()
+        raise ValueError("Cannot read data from " + str(type(file_thing)))
+
     @property
     def first_trace(self) -> str:
         return self.individuals[0].get('First')
