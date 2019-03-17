@@ -110,6 +110,11 @@ class ParseDisplayOutput:
                 return ind
         return None
 
+    ### convenience method that returns the id of Individual matching unitname, or None
+    def get_id(self, unitname) -> [str]:
+        ind = self.get_individual(unitname)
+        return ind.id if not ind is None else None
+
     ## Trace ind:  3, State: setup       , Stored:      0, Size per lim: 5000,  Type     : unit-trace      , Rotating: on , Textlevel: all, Lim no   :   1, Unit no: 0206, Unit name: CMP , Time mark: 2018-12-13 16:46:11 (CET), by user: mxone_admin
     @staticmethod
     def parse_individual(parts) -> 'Individual':

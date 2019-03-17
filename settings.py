@@ -20,5 +20,15 @@ class Settings:
         for g in gangs_list:
             if g['name'] == name:
                 return g['members']
+        return None
+
+    
+    @property
+    def default_textlevel(self) -> str:
+        return self.data.find('default_textlevel') # none means "default"
+
+    @property
+    def trace_cmd(self) -> str:
+        return self.data['trace_cmd'] or 'trace'
 
     

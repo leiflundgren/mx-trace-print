@@ -1,4 +1,6 @@
 {
+    "trace_cmd": "trace",
+    "default_textlevel": "full",
     "gangs": [
         {
             "name": "usual",
