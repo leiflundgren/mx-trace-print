@@ -2,6 +2,7 @@ import sys
 import io
 
 from tools import trace
+from command_line_parser import CommandLineParser
 
 class TraceMockup:
     def __init__(self, mxver: int):
@@ -15,10 +16,10 @@ class TraceMockup:
         else:
             raise ValueError("Unknown MX-One version " + str(mxver))
 
-        self.parse_command_line(sys.argv)
-        if 'help' in self.args or 'h' in self.args:
+        self.args = CommandLineParser(sys.argv[0], sys.argv[1:])
+        if  self.args.help:
             print(self.readfile(self.help_file))
-        elif 'display' in self.args:
+        elif  not self.args.display is None:
             print(self.readfile(self.display_file))
             pass # exit
         else:
