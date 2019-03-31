@@ -4,10 +4,39 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "prepare py 3to2",
+            "type": "shell",
+            "command": "cp",
+            "args": [
+                "-v",
+                "artefacts/mx-trace-helper.py",
+                "artefacts/mx-trace-helper2.py"
+            ]
+        },
+        {
             "label": "py3to2",
             "type": "shell",
+            "dependsOn": "prepare py 3to2",
             "command": "python",
-            "args": ["-m", "py3to2",  ]
+            "args": [
+                "C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python36_64/Scripts/3to2.py",
+                "-w",
+                "artefacts/mx-trace-helper2.py"
+            ]
+        },
+        {
+            "label": "combine py-files",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "../python_modulize/combine_py_files.py",
+                "__main__.py",
+                "artefacts/mx-trace-helper.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
