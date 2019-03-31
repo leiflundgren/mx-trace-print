@@ -1,6 +1,7 @@
 import unittest
 from executor import Executor
 from settings import Settings
+from trace_mockup import TraceMockup
 import tools 
 
 class TestExecutor(unittest.TestCase):
@@ -17,6 +18,8 @@ class TestExecutor(unittest.TestCase):
         res = executor.result
         self.assertEqual("hello world", str(res).strip())
 
+    #def run_test_mockup(self, mxver:int, prog:str, args:[str]) -> str:
+    #    executor = Executor(True, True, True, "trace-mockup")
 
 if __name__ == '__main__':
     unittest.main()
