@@ -2,8 +2,38 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
+    "type": "shell",
+    "args": [],
+    "isBackground": false,
     "tasks": [
         {
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "label": "combine py-files",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "../python_modulize/combine_py_files.py",
+                "__main__.py",
+                "artefacts/mx-trace-helper.py"
+            ]
+        },
+        {
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "dependsOn": "combine py-files",
             "label": "prepare py 3to2",
             "type": "shell",
             "command": "cp",
@@ -14,29 +44,29 @@
             ]
         },
         {
+            "dependsOn": "prepare py 3to2",
             "label": "py3to2",
             "type": "shell",
-            "dependsOn": "prepare py 3to2",
             "command": "python",
             "args": [
                 "C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python36_64/Scripts/3to2.py",
-                "-w",
-                "artefacts/mx-trace-helper2.py"
-            ]
-        },
-        {
-            "label": "combine py-files",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "../python_modulize/combine_py_files.py",
-                "__main__.py",
-                "artefacts/mx-trace-helper.py"
+                "--no-diffs",
+                "--write",
+                "--nobackups",
+                "artefacts/mx-trace-helper2.py" 
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
         }
     ]
 }
