@@ -8,9 +8,8 @@ class CommandLineParser:
     def get_arg(self, name:str) -> [str]:
         return CommandLineParser.get_argument(name, self.argv)
 
-    def replace_arg(self, name:str, val:[str]) -> [str]:
-        self.argv = CommandLineParser.replace_argument(name, self.argv, val)
-        return self.argv
+    def replace_arg(self, name:str, val:[str]) -> CommandLineParser:
+        return CommandLineParser(self.program_name, CommandLineParser.replace_argument(name, self.argv, val))
 
     @staticmethod
     def find_arg_index(name:str, argv:[str]) -> (int,int, [str]):
@@ -83,48 +82,48 @@ class CommandLineParser:
 
     @property
     def display(self) -> []:
-        return self.argv.get('display', None)
+        return self.get_arg('display')
 
     @property
     def lim(self) -> str:
-        return self.argv.get('lim', None)
+        return self.get_arg('lim')
     @property
     def unit(self) -> str:
-        return self.argv.get('unit', None)
+        return self.get_arg('unit')
     @property
     def start(self) -> str:
-        return self.argv.get('start', None)
+        return self.get_arg('start')
     @property
     def stop(self) -> str:
-        return self.argv.get('stop', None)
+        return self.get_arg('stop')
     @property
     def print(self) -> str:
-        return self.argv.get('print', None)
+        return self.get_arg('print')
 
     @property
     def print_prefix(self) -> str:
-        return self.argv.get('prefix', None)
+        return self.get_arg('prefix')
     @property
     def print_postfix(self) -> str:
-        return self.argv.get('postfix', None)
+        return self.get_arg('postfix')
     @property
     def signo(self) -> str:
-        return self.argv.get('signo', None)
+        return self.get_arg('signo')
     @property
     def show(self) -> str:
-        return self.argv.get('show', None)
+        return self.get_arg('show')
     @property
     def signal_from(self) -> str:
-        return self.argv.get('from', None)
+        return self.get_arg('from')
     @property
     def signal_to(self) -> str:
-        return self.argv.get('to', None)
+        return self.get_arg('to')
     @property
     def time_from(self) -> str:
-        return self.argv.get('from', None)
+        return self.get_arg('from')
     @property
     def time_to(self) -> str:
-        return self.argv.get('to', None)
+        return self.get_arg('to')
     # @property
     # def xxx(self) -> str:
     #     return self.argv.get('xxx', None)
