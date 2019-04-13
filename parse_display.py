@@ -66,7 +66,7 @@ class ParseDisplayOutput:
         self.individuals : List[ParseDisplayOutput.Individual] = [] 
         parts : List[str] = []
 
-        for line in self.source:
+        for line in self.source.splitlines():
             line = line.strip()
             
             ## skip header if there
@@ -94,6 +94,8 @@ class ParseDisplayOutput:
                     self.individuals.append(individual)
                 parts = []
 
+    def __str__(self) -> str:
+        return  "\n".join( [str(i) for i in self.individuals ] )
 
     @property
     def first_trace(self) -> str:
@@ -101,6 +103,7 @@ class ParseDisplayOutput:
     @property
     def last_trace(self) -> str:
         return self.individuals[0].get('Last')
+
 
     def get_individual(self, id) -> 'Individual':
         if isinstance(id, int):

@@ -5,10 +5,10 @@ class CommandLineParser:
         self.original_args = argv
         self.argv = argv
    
-    def get_arg(self, name:str) -> [str]:
-        return CommandLineParser.get_argument(name, self.argv)
+    def get_arg(self, name:str, default_value:str = None) -> [str]:
+        return CommandLineParser.get_argument(name, self.argv, default_value)
 
-    def replace_arg(self, name:str, val:[str]) -> CommandLineParser:
+    def replace_arg(self, name:str, val:[str]) -> 'CommandLineParser':
         return CommandLineParser(self.program_name, CommandLineParser.replace_argument(name, self.argv, val))
 
     @staticmethod
@@ -38,11 +38,11 @@ class CommandLineParser:
         return (-1, -1, None)
 
     @staticmethod
-    def get_argument(name:str, argv:[str]) -> [str]:
+    def get_argument(name:str, argv:[str], default_value:str = None) -> [str]:
         """ Gets the arguments to switch 'name' as a list.
         return: None is not found, otherwise a list. (If name is found but has no arguments, an empty list is returned.) """
         (_start,_stop, args) = CommandLineParser.find_arg_index(name, argv)
-        return args
+        return args if not args is None else default_value
 
     @staticmethod
     def replace_argument(name:str, argv:[str], val:[str]) -> [str]:
@@ -72,6 +72,13 @@ class CommandLineParser:
             return True # only prog-name
         else:
             return False
+
+    @property
+    def settings_file(self) -> str:
+        return (
+                self.get_arg('settings_file') 
+                or  self.get_arg('settings')
+        )
 
     @property
     def help(self) -> bool:

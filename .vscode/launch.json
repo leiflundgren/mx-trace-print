@@ -20,6 +20,15 @@
             "args": [ "-help "]
         },
         {
+            "name": "Python: test trace-mockup",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/__main__.py",
+            "console": "integratedTerminal",
+            //"args": [ "-start", "usual"]
+            "args": [ "-display"]
+        },
+        {
             "name": "Python: Current File (Integrated Terminal)",
             "type": "python",
             "request": "launch",
