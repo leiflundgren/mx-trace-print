@@ -12,27 +12,31 @@ class CommandGenerator:
     @property
     def trace_cmd(self) -> str:
         return self.settings.trace_cmd
+    @property
+    def trace_prefix_args(self) -> [str]:
+        return self.settings.trace_args
 
     @staticmethod
-    def get_cmd_add_individual(trace_prefix_args:[str], name:str, lim:str) -> str:
-        return trace_prefix_args + ['-lim', lim, '-unit', name]
+    def get_cmd_add_individual(trace_prefix_args:[str], name:str, lim:str) -> [str]:
+        lim_switch = [] if lim is None else ['-lim', lim]
+        return trace_prefix_args + lim_switch + ['-unit', name]
 
     @staticmethod
-    def get_cmd_set_textlevel(trace_prefix_args:[str], n:str, textlevel:str = 'normal') -> str:
+    def get_cmd_set_textlevel(trace_prefix_args:[str], n:str, textlevel:str = 'normal') -> [str]:
         return trace_prefix_args + ['-modify', n, '-textlevel', textlevel]
         
     @staticmethod
-    def get_cmd_start(trace_prefix_args:[str], n_list:[str]) -> str:
+    def get_cmd_start(trace_prefix_args:[str], n_list:[str]) -> [str]:
         return trace_prefix_args + ['-start', ",".join(n_list) ]
     @staticmethod
-    def get_cmd_stop(trace_prefix_args:[str], n_list:[str]) -> str:
+    def get_cmd_stop(trace_prefix_args:[str], n_list:[str]) -> [str]:
         return trace_prefix_args + ['-stop', ",".join(n_list) ]
     @staticmethod
-    def get_cmd_clear(trace_prefix_args:[str], n_list:[str]) -> str:
+    def get_cmd_clear(trace_prefix_args:[str], n_list:[str]) -> [str]:
         return trace_prefix_args + ['-clear', ",".join(n_list) ]
     
     @staticmethod
-    def get_cmd_print(trace_prefix_args:[str], unit_id:str) -> str:
+    def get_cmd_print(trace_prefix_args:[str], unit_id:str) -> [str]:
         return trace_prefix_args + ['-display', unit_id ]
 
     def expand_names(self, name_or_list) -> [str]:
@@ -75,25 +79,18 @@ class CommandGenerator:
 
         return res
 
-    def add(self, name:str, lim:str = "1") -> [str]:
+    def add(self, name:[str], lim:str = "1") -> [str]:
         res = []
-        gang = self.settings.get_gang(name)
-        # if name is not gang, assume unit-name
-        for member in gang or [name]:
+        for member in self.settings.expand_to_individuals(name):
             if self.display_output.get_individual(member) is None:
-                res.append(CommandGenerator.get_cmd_add_individual(self.trace_cmd, member, lim))
+                res.append(CommandGenerator.get_cmd_add_individual(self.trace_prefix_args, member, lim))
 
         return res
 
-    def set_textlevel(self, name:str, textlevel:str = 'normal') -> [str]:
+    def set_textlevel(self, name:[str], textlevel:str = 'normal') -> [str]:
         res = []
-        # if name is not gang, assume unit-name
-        gang = self.settings.get_gang(name) or [name]
-        if gang is None:
-            trace(2, "Unknown unit/gang '" + name + "' Textlevel not changed")
-            return None
-
-        for member in gang or [name]:
+        
+        for member in self.settings.expand_to_individuals(name):
             ind = self.display_output.get_individual(member)
             if ind is None:
                 trace(2, "Unknown gang-member '" + member + "' Textlevel not changed")

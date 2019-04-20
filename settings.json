@@ -17,9 +17,8 @@
         {
             "name": "unusual",
             "members": ["SIPLP", "MADEUP", "CMP"]
-        },
+        }
     ],
     "debug_trace_level": 7,
     "debug_trace_commands": 6
-
 }

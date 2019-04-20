@@ -35,6 +35,14 @@ class Settings:
                 return g['members']
         return None
 
+    def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
+        res = []
+        for id in ids_or_gangs:
+            members = self.get_gang(id) or [id]
+            res.extend(members)
+        return res
+
+
     @property
     def default_textlevel(self) -> str:
         return self.data.get('default_textlevel', 'default')  # none means "default"

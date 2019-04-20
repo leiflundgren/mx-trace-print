@@ -57,28 +57,27 @@ class Main:
             self.call_start(start_args, self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel)
 
     def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
-        res = []
-        for id in ids_or_gangs:
-            members = self.settings.get_gang(id) or [id]
-            res.extend(members)
-        return res
+        return self.settings.expand_to_individuals(ids_or_gangs)
 
     def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':        
         self.set_parsed_display(ParseDisplayOutput(self.execute(['-display'] + args).result))
 
     def ensure_individuals_exists(self, id_names:[str], lim:str, textlevel:str):
-        if len(args) == 0 or args[0].lowercase() == 'all':
-            args = [str(indv) for indv in self.parsed_display.individuals]
-        undef_indv = filter(lambda id: self.parsed_display.get_individual(id) is None, self.parsed_display.individuals)
-        if len(undef_indv) == 0:
+        if len(id_names) == 0 or id_names[0].lower() == 'all':
+            id_names = [str(indv) for indv in self.parsed_display.individuals]
+        else:
+            id_names = self.settings.expand_to_individuals(id_names)
+        f = filter(lambda id: self.parsed_display.get_individual(id) is None, id_names)        
+        undef_indv = list(f)
+        if not undef_indv:
             return
         self.add_individuals(undef_indv, lim, textlevel)
 
     def add_individuals(self, individuals:[str], lim:str, textlevel:str):
-
-        add_cmds = self.command_generator.add(individuals, lim)
-        for add_cmd in add_cmds:
+        trace(4, "Adding individuals ", individuals)
+        for add_cmd in self.command_generator.add(individuals, lim):
             self.execute(add_cmd)
+
         self.call_display()
 
         for id in individuals:
