@@ -13,8 +13,13 @@
         {
             "name": "csta",
             "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
-        }
+        },
+        {
+            "name": "unusual",
+            "members": ["SIPLP", "MADEUP", "CMP"]
+        },
     ],
-    "debug_print_commands": true
+    "debug_trace_level": 7,
+    "debug_trace_commands": 6
 
 }

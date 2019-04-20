@@ -14,26 +14,26 @@ class CommandGenerator:
         return self.settings.trace_cmd
 
     @staticmethod
-    def get_cmd_add_individual(trace_cmd:str, name:str, lim:str) -> str:
-        return '{trace} -lim {lim} -unit {unit}'.format(trace=trace_cmd,unit=name, lim=lim)
+    def get_cmd_add_individual(trace_prefix_args:[str], name:str, lim:str) -> str:
+        return trace_prefix_args + ['-lim', lim, '-unit', name]
 
     @staticmethod
-    def get_cmd_set_textlevel(trace_cmd:str, n:str, textlevel:str = 'normal') -> str:
-        return '{trace} -modify {n} -textlevel {textlevel}'.format(trace=trace_cmd,n=n, textlevel=textlevel)
+    def get_cmd_set_textlevel(trace_prefix_args:[str], n:str, textlevel:str = 'normal') -> str:
+        return trace_prefix_args + ['-modify', n, '-textlevel', textlevel]
         
     @staticmethod
-    def get_cmd_start(trace_cmd:str, n_list:[str]) -> str:
-        return '{trace} -start {ns}'.format(trace=trace_cmd,n=",".join(n_list))
+    def get_cmd_start(trace_prefix_args:[str], n_list:[str]) -> str:
+        return trace_prefix_args + ['-start', ",".join(n_list) ]
     @staticmethod
-    def get_cmd_stop(trace_cmd:str, n_list:[str]) -> str:
-        return '{trace} -stop {ns}'.format(trace=trace_cmd,n=",".join(n_list))
+    def get_cmd_stop(trace_prefix_args:[str], n_list:[str]) -> str:
+        return trace_prefix_args + ['-stop', ",".join(n_list) ]
     @staticmethod
-    def get_cmd_clear(trace_cmd:str, n_list:[str]) -> str:
-        return '{trace} -clear {ns}'.format(trace=trace_cmd,n=",".join(n_list))
+    def get_cmd_clear(trace_prefix_args:[str], n_list:[str]) -> str:
+        return trace_prefix_args + ['-clear', ",".join(n_list) ]
     
     @staticmethod
-    def get_cmd_print(trace_cmd:str, unit_id:str) -> str:
-        return '{trace} -display {ns}'.format(trace=trace_cmd, ns=unit_id)
+    def get_cmd_print(trace_prefix_args:[str], unit_id:str) -> str:
+        return trace_prefix_args + ['-display', unit_id ]
 
     def expand_names(self, name_or_list) -> [str]:
         def expand_ranges(ls:[str]) -> [str]:
@@ -106,15 +106,15 @@ class CommandGenerator:
 
     def start(self, name:[str]) -> [str]:
         ids = self.get_ids_of(name)
-        return map(self.get_cmd_start, ids)
+        return map(lambda i: self.get_cmd_start(self.settings.trace_prefix_args, i), ids)
 
     def stop(self, name:[str]) -> [str]:
         ids = self.get_ids_of(name)
-        return map(self.get_cmd_stop, ids)
+        return map(lambda i: self.get_cmd_stop(self.settings.trace_prefix_args, i), ids)
 
     def clear(self, name:[str]) -> [str]:
         ids = self.get_ids_of(name)
-        return map(self.get_cmd_clear, ids)
+        return map(lambda i: self.get_cmd_clear(self.settings.trace_prefix_args, i), ids)
 
 
 

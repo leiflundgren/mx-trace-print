@@ -51,11 +51,17 @@ class Settings:
         """
         return self.data.get('trace_args', [])
 
-    @property
-    def debug_print_commands(self) -> bool:
-        return self.data.get('debug_print_commands', False)
+    
 
     @property
-    def debug_print_output(self) -> bool:
-        v = self.data.get('debug_print_output')
-        return v is not v is None or self.debug_print_commands
+    def debug_trace_level(self) -> int:
+        return self.data.get('debug_trace_level', 7)
+
+    @property
+    def debug_trace_commands(self) -> int:
+        return self.data.get('debug_trace_commands', 7)
+
+    @property
+    def debug_trace_output(self) -> int:
+        v = self.data.get('debug_trace_output')
+        return v is not v is None or self.debug_trace_output

@@ -25,8 +25,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/__main__.py",
             "console": "integratedTerminal",
-            //"args": [ "-start", "usual"]
-            "args": [ "-display"]
+            "args": [ "-start", "unusual"]
+            //"args": [ "-display"]
         },
         {
             "name": "Python: Current File (Integrated Terminal)",

@@ -21,7 +21,7 @@ def open_file(name) -> io.TextIOBase:
 tracelevel = 4
 log_handle = None
 
-def trace(level, *args):
+def trace(level:int, *args):
     def fix_linendings(s: str) -> str:
         if os.linesep == '\n':
             return s

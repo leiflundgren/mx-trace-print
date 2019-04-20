@@ -131,6 +131,9 @@ class CommandLineParser:
     @property
     def time_to(self) -> str:
         return self.get_arg('to')
+    @property
+    def textlevel(self) -> str:
+        return self.get_arg('textlevel')        
     # @property
     # def xxx(self) -> str:
     #     return self.argv.get('xxx', None)
