@@ -21,8 +21,10 @@ class TestCommendLineParser(unittest.TestCase):
         r = CommandLineParser.find_arg_index('flera', argv)
         self.assertEqual((6, 9, ['arg', 'till', 'denna']), r)
 
-
-
+        cmd = CommandLineParser(argv[0], argv[1:])
+        self.assertEqual('hopp', cmd.get_arg('hej'))
+        self.assertEqual(['arg', 'till', 'denna'], cmd.get_args('flera'))
+        self.assertEqual('arg', cmd.get_arg('flera'))
 
 if __name__ == '__main__':
     unittest.main()

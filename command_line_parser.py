@@ -5,8 +5,16 @@ class CommandLineParser:
         self.original_args = argv
         self.argv = argv
    
-    def get_arg(self, name:str, default_value:str = None) -> [str]:
+    def get_args(self, name:str, default_value:str = None) -> [str]:
         return CommandLineParser.get_argument(name, self.argv, default_value)
+
+    def get_arg(self, name:str, default_value:str = None) -> str:
+        arg = self.get_args(name, default_value)
+        return None if arg is None or len(arg) == 0 else arg[0]
+    
+    def has_arg(self, name:str, default_value:str = None) -> bool:
+        arg_ls = self.get_args(name, default_value)
+        return not arg_ls is None
 
     def replace_arg(self, name:str, val:[str]) -> 'CommandLineParser':
         return CommandLineParser(self.program_name, CommandLineParser.replace_argument(name, self.argv, val))
@@ -38,11 +46,18 @@ class CommandLineParser:
         return (-1, -1, None)
 
     @staticmethod
-    def get_argument(name:str, argv:[str], default_value:str = None) -> [str]:
+    def get_argument(name:str, argv:[str], default_value:[str] = None) -> [str]:
         """ Gets the arguments to switch 'name' as a list.
         return: None is not found, otherwise a list. (If name is found but has no arguments, an empty list is returned.) """
         (_start,_stop, args) = CommandLineParser.find_arg_index(name, argv)
-        return args if not args is None else default_value
+        if not args is None:
+            return args
+        if default_value is None:
+            return None
+        if isinstance(default_value, list):
+            return default_value
+        else:
+            return [default_value]
 
     @staticmethod
     def replace_argument(name:str, argv:[str], val:[str]) -> [str]:
@@ -82,14 +97,14 @@ class CommandLineParser:
 
     @property
     def help(self) -> bool:
-        return (
-                not self.get_arg('help') is None 
-                or not self.get_arg('h') is None
-        )
+        return self.has_arg('help') or self.has_arg('h')
 
     @property
-    def display(self) -> []:
-        return self.get_arg('display')
+    def display(self) -> [str]:
+        """
+            :return: the optional argument to display [0,1..15]
+        """
+        return self.get_args('display')
 
     @property
     def lim(self) -> str:

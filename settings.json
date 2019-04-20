@@ -1,9 +1,5 @@
 {
-    // "trace_cmd": "trace",
-    // "trace_cmd": "echo",
-    // "trace_args": [],
-    "trace_cmd": "python",
-    "trace_args": ["trace_mockup_7x.py"],
+    "trace_cmd": "trace",
     "default_textlevel": "full",
     "gangs": [
         {

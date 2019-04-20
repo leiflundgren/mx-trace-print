@@ -37,7 +37,8 @@ class Settings:
 
     def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
         res = []
-        for id in ids_or_gangs:
+        ls = ids_or_gangs if isinstance(ids_or_gangs, list) else [ids_or_gangs]
+        for id in ls:
             members = self.get_gang(id) or [id]
             res.extend(members)
         return res

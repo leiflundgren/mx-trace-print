@@ -17,27 +17,27 @@ class CommandGenerator:
         return self.settings.trace_args
 
     @staticmethod
-    def get_cmd_add_individual(trace_prefix_args:[str], name:str, lim:str) -> [str]:
+    def get_cmd_add_individual(name:str, lim:str) -> [str]:
         lim_switch = [] if lim is None else ['-lim', lim]
-        return trace_prefix_args + lim_switch + ['-unit', name]
+        return lim_switch + ['-unit', name]
 
     @staticmethod
-    def get_cmd_set_textlevel(trace_prefix_args:[str], n:str, textlevel:str = 'normal') -> [str]:
-        return trace_prefix_args + ['-modify', n, '-textlevel', textlevel]
+    def get_cmd_set_textlevel(n:str, textlevel:str = 'normal') -> [str]:
+        return ['-modify', n, '-textlevel', textlevel]
         
     @staticmethod
-    def get_cmd_start(trace_prefix_args:[str], n_list:[str]) -> [str]:
-        return trace_prefix_args + ['-start', ",".join(n_list) ]
+    def get_cmd_start(n_list:[str]) -> [str]:
+        return ['-start', ",".join(n_list) ]
     @staticmethod
-    def get_cmd_stop(trace_prefix_args:[str], n_list:[str]) -> [str]:
-        return trace_prefix_args + ['-stop', ",".join(n_list) ]
+    def get_cmd_stop(n_list:[str]) -> [str]:
+        return ['-stop', ",".join(n_list) ]
     @staticmethod
-    def get_cmd_clear(trace_prefix_args:[str], n_list:[str]) -> [str]:
-        return trace_prefix_args + ['-clear', ",".join(n_list) ]
+    def get_cmd_clear(n_list:[str]) -> [str]:
+        return ['-clear', ",".join(n_list) ]
     
     @staticmethod
-    def get_cmd_print(trace_prefix_args:[str], unit_id:str) -> [str]:
-        return trace_prefix_args + ['-display', unit_id ]
+    def get_cmd_print(unit_id:str) -> [str]:
+        return ['-display', unit_id ]
 
     def expand_names(self, name_or_list) -> [str]:
         def expand_ranges(ls:[str]) -> [str]:
@@ -82,8 +82,8 @@ class CommandGenerator:
     def add(self, name:[str], lim:str = "1") -> [str]:
         res = []
         for member in self.settings.expand_to_individuals(name):
-            if self.display_output.get_individual(member) is None:
-                res.append(CommandGenerator.get_cmd_add_individual(self.trace_prefix_args, member, lim))
+            if self.display_output.get_individual(member) is None:               
+                res.append(CommandGenerator.get_cmd_add_individual(member, lim))
 
         return res
 
@@ -91,34 +91,34 @@ class CommandGenerator:
         res = []
         
         for member in self.settings.expand_to_individuals(name):
-            ind = self.display_output.get_individual(member)
-            if ind is None:
+            indv = self.display_output.get_individual(member)
+            if indv is None:
                 trace(2, "Unknown gang-member '" + member + "' Textlevel not changed")
                 continue
-            
-            res.append(CommandGenerator.get_cmd_set_textlevel(ind.id, textlevel))
+            id = indv.id
+            res.append(CommandGenerator.get_cmd_set_textlevel(id, textlevel))
         
         return res 
 
 
     def start(self, name:[str]) -> [str]:
         ids = self.get_ids_of(name)
-        return map(lambda i: self.get_cmd_start(self.settings.trace_prefix_args, i), ids)
+        return map(lambda i: self.get_cmd_start(i), ids)
 
     def stop(self, name:[str]) -> [str]:
         ids = self.get_ids_of(name)
-        return map(lambda i: self.get_cmd_stop(self.settings.trace_prefix_args, i), ids)
+        return map(lambda i: self.get_cmd_stop(i), ids)
 
     def clear(self, name:[str]) -> [str]:
         ids = self.get_ids_of(name)
-        return map(lambda i: self.get_cmd_clear(self.settings.trace_prefix_args, i), ids)
+        return map(lambda i: self.get_cmd_clear(i), ids)
 
 
 
     ### Returns a list of tuples(print-cmd, target-filename)
     def print_cmd(self, names:[str], prefix:str = "", postfix:str = ".log", ) -> [(str, str)]:
         def gen_tuple(unitname, id):
-            cmd = CommandGenerator.get_cmd_print(self.trace_cmd, id)
+            cmd = CommandGenerator.get_cmd_print(id)
             filename = (prefix+sep+unitname+postfix).strip(sep)
             return (cmd, filename)
 

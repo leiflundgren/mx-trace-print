@@ -10,9 +10,9 @@ import io
 import os
 
 class Main:
-    def __init__(self, program_name, argv:[str]) -> None:
+    def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
         self.command_line = CommandLineParser(program_name, argv)
-        self.settings = Main.find_settings(self.command_line.settings_file)
+        self.settings = settings or Main.find_settings(self.command_line.settings_file)
         self.parsed_display : ParseDisplayOutput = None
         self.command_generator : CommandGenerator = None
 
@@ -20,8 +20,16 @@ class Main:
         self.parsed_display = val
         self.command_generator = CommandGenerator(val, self.settings)
 
-    def execute(self, args:[str]) -> 'Executor':
+    def execute(self, args:[str]) -> 'Executor':        
         return Executor(self.settings.trace_cmd, self.settings.trace_args + args, trace_cmd_level=self.settings.debug_trace_commands)
+
+    def execute_all(self, list_of_args:[[str]]):
+        if not isinstance(list_of_args, list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
+        if not isinstance(list_of_args[0], list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
+
+        for args in list_of_args:
+            self.execute(args)
+
 
     @staticmethod 
     def find_settings(file: str = None) -> str:
@@ -53,14 +61,15 @@ class Main:
 
         start_args = self.command_line.start
         if not start_args is None:
-            self.call_display(start_args)
-            self.call_start(start_args, self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel)
+            self.call_display()
+            self.call_start(start_args.split(','), self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel)
 
     def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
         return self.settings.expand_to_individuals(ids_or_gangs)
 
     def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':        
-        self.set_parsed_display(ParseDisplayOutput(self.execute(['-display'] + args).result))
+        disp_output = self.execute(['-display'] + args).result
+        self.set_parsed_display(ParseDisplayOutput(disp_output))
 
     def ensure_individuals_exists(self, id_names:[str], lim:str, textlevel:str):
         if len(id_names) == 0 or id_names[0].lower() == 'all':
@@ -75,8 +84,7 @@ class Main:
 
     def add_individuals(self, individuals:[str], lim:str, textlevel:str):
         trace(4, "Adding individuals ", individuals)
-        for add_cmd in self.command_generator.add(individuals, lim):
-            self.execute(add_cmd)
+        self.execute_all(self.command_generator.add(individuals, lim))
 
         self.call_display()
 
@@ -86,7 +94,7 @@ class Main:
                 trace(2, 'Failed to create induvidual ' + id)
                 sys.exit(17)
             if indv.textlevel != textlevel:
-                self.command_generator.set_textlevel(id, textlevel)
+                self.execute_all(self.command_generator.set_textlevel(id, textlevel))
             
 
     def call_start(self, args:[str], lim:str, textlevel:str):
@@ -101,6 +109,12 @@ class Main:
     def call_start_individual(self, id_name:str, lim:str):
         
         pass
+
+def foo():
+    return 'foo'
+
+def bar():
+    return 'bar'
 
 if __name__ == "__main__":
     Main(sys.argv[0], sys.argv[1:]).main()

@@ -20,7 +20,7 @@
             "command": "python",
             "args": [
                 "../python_modulize/combine_py_files.py",
-                "__main__.py",
+                "main.py",
                 "artefacts/mx-trace-helper.py"
             ]
         },

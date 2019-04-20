@@ -66,12 +66,16 @@ class ParseDisplayOutput:
         self.individuals : List[ParseDisplayOutput.Individual] = [] 
         parts : List[str] = []
 
+        in_header = True
         for line in self.source.splitlines():
             line = line.strip()
             
-            ## skip header if there
-            if line.endswith( 'trace -display'):
-                continue
+            ## skip header, until a line starts with Version
+            if in_header:
+                if line.startswith('Version'):
+                    in_header = False
+                else:
+                    continue
 
             if line.startswith('Version'):
                 mpos = line.index(', Market:')
