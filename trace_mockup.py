@@ -12,19 +12,23 @@ class TraceMockup:
         if self.mxver == 6:
             self.help_file = 'trace-help.output'
             self.display_file = 'trace-display.output'
+            self.print_file = 'trace-print-6x.output'
         elif self.mxver == 7:
             self.help_file = 'trace-help-7.x.output'
             self.display_file = 'trace-display-7.x.output'
+            self.print_file = 'trace-print-6x.output' # TODO, change to 7 
         else:
             raise ValueError("Unknown MX-One version " + str(self.mxver))
 
         display_args = self.args.display
+        print_args = self.args.print
 
         if self.args.help:
             self.print_help()
         elif not display_args is None:
             self.print_display()
-            pass # exit
+        elif not print_args is None:
+            self.print_print(print_args)
         else:
             print("args: " + " ".join(sys.argv[1:]))
             pass
@@ -59,6 +63,27 @@ class TraceMockup:
         with open(file, 'r', encoding='iso-8859-1') as f:
             return str(f.read())
 
+    def print_print(self, arg:str) -> str:
+        n = -1
+        try:
+            n = int(arg)
+        except:
+            raise ValueError("Should print individ-id: '" + arg + "'")
+        disp_str = self.readfile(self.print_file)
+        unit_name = ''
+        if n == 1:
+            unit_name = 'SIPLP' # don't change
+        elif n == 3: # CMP
+            unit_name = 'CMP'
+        elif n == 4: # RMP
+            unit_name = 'RMP'
+        else:
+            raise ValueError("trace-mockup can only print 1-SIPLP/3:CMP/4:RMP")
+
+        ouput = disp_str.replace(' Trace ind:  1', ' Trace ind:  ' + str(n))
+        ouput = ouput.replace(' Unit name: SIPLP', ' Unit name: ' + unit_name)
+        print(ouput)
+        return ouput
 
     def parse_command_line(self, argv:[str]) -> None:
         self.args = {}

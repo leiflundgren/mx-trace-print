@@ -1,4 +1,5 @@
 from tools import trace
+from tools import tracelevel
 from parse_display import ParseDisplayOutput
 from command_generator import CommandGenerator
 
@@ -15,11 +16,14 @@ class Executor:
         trace(trace_cmd_level, 'Executor ' + program, args)
         try:
             self.result = subprocess.check_output(prog_args)
-            if isinstance(self.result, bytes): self.result = self.result.decode()
-            trace(trace_result_level, self.result)
+            if tracelevel >= trace_result_level:
+                trace(trace_result_level, self.str_result)
         except subprocess.CalledProcessError as e:
             trace(1, e.cmd, 'failed with ', e.returncode)
             trace(1, e.output)
             sys.exit(e.returncode)
 
+    @property
+    def str_result(self):
+        return self.result.decode() if isinstance(self.result, bytes) else self.result
 

@@ -23,16 +23,15 @@ class Main:
     def execute(self, args:[str]) -> 'Executor':        
         return Executor(self.settings.trace_cmd, self.settings.trace_args + args, trace_cmd_level=self.settings.debug_trace_commands)
 
-    def execute_all(self, list_of_args:[[str]]):
+    def execute_all(self, list_of_args:[[str]]) -> str:
         if not isinstance(list_of_args, list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
         if not isinstance(list_of_args[0], list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
 
-        for args in list_of_args:
-            self.execute(args)
+        return "\n".join([self.execute(arg).str_result for arg in list_of_args])
 
 
     @staticmethod 
-    def find_settings(file: str = None) -> str:
+    def find_settings(file:str = None) -> str:
         ex = None
         files = [
             file,            
@@ -51,7 +50,7 @@ class Main:
         return Settings("{\n}") # Return empty settings
             
 
-    def main(self):
+    def main(self) -> str:
         trace(1, "placeholder for main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.original_args)+ " ]")
         display_args = self.command_line.display
         if not display_args is None:
@@ -63,12 +62,29 @@ class Main:
         if not start_args is None:
             self.call_display()
             self.call_start(start_args.split(','), self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel)
+            return
+
+        stop_args = self.command_line.stop
+        if not stop_args is None:
+            self.call_display()
+            self.call_stop(stop_args.split(','))
+            return
+
+        print_args = self.command_line.print
+        if not print_args is None:
+            self.call_display()
+            printout = self.call_print(print_args.split(','))
+            print(printout)
+            return printout
 
     def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
-        return self.settings.expand_to_individuals(ids_or_gangs)
+        if len(ids_or_gangs) == 0 or ids_or_gangs[0].lower() == 'all':
+            return [str(indv) for indv in self.parsed_display.individuals]
+        else:
+            return self.settings.expand_to_individuals(ids_or_gangs)
 
     def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':        
-        disp_output = self.execute(['-display'] + args).result
+        disp_output = self.execute(['-display'] + args).str_result
         self.set_parsed_display(ParseDisplayOutput(disp_output))
 
     def ensure_individuals_exists(self, id_names:[str], lim:str, textlevel:str):
@@ -106,9 +122,22 @@ class Main:
         for indv_start in start_cmds:
             self.execute(indv_start)
     
-    def call_start_individual(self, id_name:str, lim:str):
-        
-        pass
+    def call_stop(self, args:[str]):
+        if self.parsed_display is None:
+            raise ValueError("Called stop when no display parser yet!")
+        individuals = self.expand_to_individuals(args)
+        existing = filter(lambda id: not self.parsed_display.get_individual(id) is None, individuals)        
+        stop_cmds = self.command_generator.stop(existing)
+        for indv_stop in stop_cmds:
+            self.execute(indv_stop)
+
+    def call_print(self, args:[str]) -> str:
+        if self.parsed_display is None:
+            raise ValueError("Called print when no display parser yet!")
+        individuals = self.expand_to_individuals(args)
+        existing = filter(lambda id: not self.parsed_display.get_individual(id) is None, individuals)        
+        print_cmds = self.command_generator.print_cmd(existing)
+        return self.execute_all(print_cmds)
 
 def foo():
     return 'foo'

@@ -63,11 +63,14 @@ class ParseDisplayOutput:
 
     def __init__(self, source) -> None:
         self.source = tools.read(source)
+        if isinstance(self.source, str):
+            self.source = self.source.splitlines()
+
         self.individuals : List[ParseDisplayOutput.Individual] = [] 
         parts : List[str] = []
 
         in_header = True
-        for line in self.source.splitlines():
+        for line in self.source:
             line = line.strip()
             
             ## skip header, until a line starts with Version

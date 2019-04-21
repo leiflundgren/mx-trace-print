@@ -49,7 +49,7 @@ class TestCommendGenerator(unittest.TestCase):
 
     def test_print_usual(self):
         self.trace(3, 'Printing buffers for usual gang: SIPLP, RMP, CMP')
-        cmd = self.cmdgen.print_cmd(['usual'], 'sample', '.log')
+        cmd = self.cmdgen.save_cmd(self.settings.expand_to_individuals(['usual']), 'sample_')
         self.trace(3, "    " +  "\n    ".join( map(lambda t: ("(" + ",".join(t) + ")"), cmd) ) )
         self.assertEqual(3, len(cmd))
         self.assertEqual('sample_SIPLP.log', cmd[0][1])

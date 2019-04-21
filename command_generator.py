@@ -37,7 +37,7 @@ class CommandGenerator:
     
     @staticmethod
     def get_cmd_print(unit_id:str) -> [str]:
-        return ['-display', unit_id ]
+        return ['-print', unit_id ]
 
     def expand_names(self, name_or_list) -> [str]:
         def expand_ranges(ls:[str]) -> [str]:
@@ -116,7 +116,7 @@ class CommandGenerator:
 
 
     ### Returns a list of tuples(print-cmd, target-filename)
-    def print_cmd(self, names:[str], prefix:str = "", postfix:str = ".log", ) -> [(str, str)]:
+    def save_cmd(self, names:[str], prefix:str = "", postfix:str = ".log", ) -> [(str, str)]:
         def gen_tuple(unitname, id):
             cmd = CommandGenerator.get_cmd_print(id)
             filename = (prefix+sep+unitname+postfix).strip(sep)
@@ -132,4 +132,17 @@ class CommandGenerator:
                 trace(2, "print_cmd: unknown unit " + name + ", not printed")
                 continue
             res.append(gen_tuple(name, id))
+        return res
+
+    ### Returns a list print-cmd
+    def print_cmd(self, names:[str]) -> [str]:
+        res = []
+
+        for name in names:
+            id = self.display_output.get_id(name)
+            if id is None:
+                trace(2, "print_cmd: unknown unit " + name + ", not printed")
+                continue
+            cmd = CommandGenerator.get_cmd_print(id)
+            res.append(cmd)
         return res
