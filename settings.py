@@ -9,12 +9,15 @@ class Settings:
     def __init__(self, settings_file):
         if isinstance(settings_file, io.TextIOBase):
             self.__init__(settings_file.read())
+            return
         elif isinstance(settings_file, str) and (settings_file.count('\n') > 1 or not os.path.exists(settings_file) ):
             trimmed = Settings.trim_json_comments(settings_file)
             self.data = json.load(io.StringIO(trimmed))
+            tools.tracelevel = self.debug_trace_level
         elif isinstance(settings_file, str):
             with tools.open_read_file(settings_file) as f:
                 self.__init__(f.read())
+                return
 
     @staticmethod
     def trim_json_comments(data_string):
@@ -60,6 +63,19 @@ class Settings:
         """
         return self.data.get('trace_args', [])
 
+    @property
+    def save_prefix(self) -> str:
+        """
+            Prefix for trace output files
+        """
+        return self.data.get('save_prefix', 'trace_mx_')
+
+    @property
+    def save_postfix(self) -> str:
+        """
+            Postfix for trace output files
+        """
+        return self.data.get('save_postfix', '.log')
     
 
     @property

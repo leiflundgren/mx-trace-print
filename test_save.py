@@ -43,7 +43,7 @@ class TestSave(unittest.TestCase):
         
     # issues save command, checks 
     def run_save(self, save_arg:str, expected_file_count:int) -> str:
-        folder = os.path.join(self.tempfolder, self._testMethodName)
+        folder = os.path.join(self.tempfolder.name, self._testMethodName)
         trace(5, 'Creating ', folder)
         os.mkdir(folder)
 
@@ -51,29 +51,54 @@ class TestSave(unittest.TestCase):
 
         Main('fake_progname', ['-save', save_arg, '-mxver', '7', '-prefix', prefix], settings=self.settings).main()
         
+        files = os.listdir(folder)
+        trace(3, 'Test ' + self._testMethodName + " yielded " + str(len(files)), " files:", files)
+
         if expected_file_count >= 0:
-            self.assertEqual(expected_file_count, len(os.listdir(folder)), msg='Expected there to be ' + str(expected_file_count) + " files after test. Got: " + " ".join(os.listdir(folder)))
+            self.assertEqual(expected_file_count, len(files), msg='Expected there to be ' + str(expected_file_count) + " files after test. Got: " + " ".join(files))
         
         return folder
+    
+
+    def assertFileInOutput(self, folder:str, required:str):
+        files = os.listdir(folder)
+        self.assertTrue(filter(lambda f: f.find(required), files), msg='Expected ' + str(required) +' to be in output')
 
     def test_save_a_id(self):
-        print('==================================')
-        print('== test_save_a_id')
-        print('==================================')
-        folder = self.run_save('1', 1)
-
-    def test_print_b_indv(self):
-        print('==================================')
-        print('== test_print_b_indv')
-        print('==================================')
-        folder = self.run_save('SIPLP', 1)
-
-    def test_print_c_gang(self):
-        print('==================================')
-        print('== test_print_c_gang')
-        print('==================================')
-        folder = self.run_save('usual', 3)
-
+        try:
+            print('==================================')
+            print('== test_save_a_id')
+            print(' temp folder: ' + self.tempfolder.name)
+            print('==================================')
+            folder = self.run_save('1', 1)
+            self.assertFileInOutput(folder, 'SIPLP')
+        except Exception as e: 
+                trace(1, 'Test ', self._testMethodName, ' failed: ', str(e))
+                raise
+    def test_save_b_indv(self):
+        try:
+            print('==================================')
+            print('== test_print_b_indv')
+            print(' temp folder: ' + self.tempfolder.name)
+            print('==================================')
+            folder = self.run_save('SIPLP', 1)
+            self.assertFileInOutput(folder, 'SIPLP')
+        except Exception as e: 
+                trace(1, 'Test ', self._testMethodName, ' failed: ', str(e))
+                raise
+    def test_save_c_gang(self):
+        try:
+            print('==================================')
+            print('== test_print_c_gang')
+            print(' temp folder: ' + self.tempfolder.name)
+            print('==================================')
+            folder = self.run_save('usual', 3)
+            self.assertFileInOutput(folder, 'SIPLP')
+            self.assertFileInOutput(folder, 'RMP')
+            self.assertFileInOutput(folder, 'CMP')
+        except Exception as e: 
+                trace(1, 'Test ', self._testMethodName, ' failed: ', str(e))
+                raise
         # #check RMP
         # self.assertTrue(re.search(" Trace ind: *3", result))
         # self.assertTrue(re.search(" Unit name: *RMP", result))

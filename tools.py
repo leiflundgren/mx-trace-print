@@ -75,7 +75,7 @@ def trace(level:int, *args, file=sys.stdout):
         msg += mystr(thing)
 
     msg = msg.rstrip()
-    handle = sys.stderr if log_handle is None else log_handle
+    handle = file if not file is None else ( sys.stderr if log_handle is None  else log_handle )
 
     try:
         print(msg, file=handle)

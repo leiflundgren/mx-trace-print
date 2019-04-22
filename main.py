@@ -83,9 +83,11 @@ class Main:
 
         save_args = self.command_line.save
         if not save_args is None:
-            trace(3, "save " + " ".join(save_args) + ", prefix=" + self.command_line.save_prefix + ", postfix=" + self.command_line.save_postfix)
+            prefix=self.command_line.save_prefix or self.settings.save_prefix
+            postfix=self.command_line.save_postfix or self.settings.save_postfix
+            trace(3, "save " + save_args , ", prefix=" , prefix , ", postfix=" , postfix)
             self.call_display()
-            self.call_save(save_args.split(','), self.command_line.save_prefix, self.command_line.save_postfix)
+            self.call_save(save_args.split(','), prefix, postfix)
 
         
 
@@ -160,8 +162,8 @@ class Main:
         existing_individuals = filter(lambda indv: not indv is None, individuals)        
         
         for indv in existing_individuals:
-            (print_cmd, filename) = self.command_generator.save_cmd([indv])[0]        
-            trace(3, 'printing ' + indv.id + "/" + indv.name + " to " + filename)
+            (print_cmd, filename) = self.command_generator.save_cmd([indv.unit_name], prefix, postfix)[0]        
+            trace(3, 'printing ' + indv.id + "/" + indv.unit_name + " to " + filename)
             ex = self.execute(print_cmd)
             with io.open(filename, "w", encoding="latin-1") as fil:
                 fil.write(ex.str_result)
