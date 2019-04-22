@@ -14,14 +14,14 @@ def read(file_thing) -> [str]:
                 return f.readlines()
     raise ValueError("Cannot read data from " + str(type(file_thing)))
 
-def open_file(name) -> io.TextIOBase:
+def open_read_file(name) -> io.TextIOBase:
     return open(name, "r", encoding='iso-8859-1')
 
 
 tracelevel = 4
 log_handle = None
 
-def trace(level:int, *args):
+def trace(level:int, *args, file=sys.stdout):
     def fix_linendings(s: str) -> str:
         if os.linesep == '\n':
             return s

@@ -13,7 +13,7 @@ class Settings:
             trimmed = Settings.trim_json_comments(settings_file)
             self.data = json.load(io.StringIO(trimmed))
         elif isinstance(settings_file, str):
-            with tools.open_file(settings_file) as f:
+            with tools.open_read_file(settings_file) as f:
                 self.__init__(f.read())
 
     @staticmethod

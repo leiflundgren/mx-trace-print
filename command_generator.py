@@ -1,5 +1,6 @@
 from parse_display import ParseDisplayOutput
 from tools import trace
+import sys
 
 class CommandGenerator:
 
@@ -129,7 +130,7 @@ class CommandGenerator:
         for name in self.expand_names(names):
             id = self.display_output.get_id(name)
             if id is None:
-                trace(2, "print_cmd: unknown unit " + name + ", not printed")
+                trace(2, "print_cmd: unknown unit " + name + ", not printed", file=sys.stderr)
                 continue
             res.append(gen_tuple(name, id))
         return res
@@ -141,7 +142,7 @@ class CommandGenerator:
         for name in names:
             id = self.display_output.get_id(name)
             if id is None:
-                trace(2, "print_cmd: unknown unit " + name + ", not printed")
+                trace(2, "print_cmd: unknown unit " + name + ", not printed", file=sys.stderr)
                 continue
             cmd = CommandGenerator.get_cmd_print(id)
             res.append(cmd)

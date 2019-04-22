@@ -123,11 +123,15 @@ class CommandLineParser:
         return self.get_arg('print')
 
     @property
-    def print_prefix(self) -> str:
+    def save(self) -> str:
+        return self.get_arg('save')
+    @property
+    def save_prefix(self) -> str:
         return self.get_arg('prefix')
     @property
-    def print_postfix(self) -> str:
+    def save_postfix(self) -> str:
         return self.get_arg('postfix')
+
     @property
     def signo(self) -> str:
         return self.get_arg('signo')

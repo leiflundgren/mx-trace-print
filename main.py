@@ -51,31 +51,43 @@ class Main:
             
 
     def main(self) -> str:
-        trace(1, "placeholder for main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.original_args)+ " ]")
+        trace(7, "main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.original_args)+ " ]")
         display_args = self.command_line.display
         if not display_args is None:
+            trace(3, "display " + " ".join(display_args), file=sys.stderr)
             self.call_display(display_args)
             print(self.parsed_display)
             return
 
         start_args = self.command_line.start
         if not start_args is None:
+            trace(3, "start " + " ".join(start_args))
             self.call_display()
             self.call_start(start_args.split(','), self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel)
             return
 
         stop_args = self.command_line.stop
         if not stop_args is None:
+            trace(3, "stop " + " ".join(stop_args))
             self.call_display()
             self.call_stop(stop_args.split(','))
             return
 
         print_args = self.command_line.print
         if not print_args is None:
+            trace(3, "print " + " ".join(print_args))
             self.call_display()
             printout = self.call_print(print_args.split(','))
             print(printout)
             return printout
+
+        save_args = self.command_line.save
+        if not save_args is None:
+            trace(3, "save " + " ".join(save_args) + ", prefix=" + self.command_line.save_prefix + ", postfix=" + self.command_line.save_postfix)
+            self.call_display()
+            self.call_save(save_args.split(','), self.command_line.save_prefix, self.command_line.save_postfix)
+
+        
 
     def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
         if len(ids_or_gangs) == 0 or ids_or_gangs[0].lower() == 'all':
@@ -138,12 +150,24 @@ class Main:
         existing = filter(lambda id: not self.parsed_display.get_individual(id) is None, individuals)        
         print_cmds = self.command_generator.print_cmd(existing)
         return self.execute_all(print_cmds)
-
-def foo():
-    return 'foo'
-
-def bar():
-    return 'bar'
+    
+    def call_save(self, args:[str], prefix, postfix) -> str:
+        if self.parsed_display is None:
+            raise ValueError("Called print when no display parser yet!")
+        individuals_names = self.expand_to_individuals(args)
+        individuals = map(lambda id: self.parsed_display.get_individual(id), individuals_names)
+        
+        existing_individuals = filter(lambda indv: not indv is None, individuals)        
+        
+        for indv in existing_individuals:
+            (print_cmd, filename) = self.command_generator.save_cmd([indv])[0]        
+            trace(3, 'printing ' + indv.id + "/" + indv.name + " to " + filename)
+            ex = self.execute(print_cmd)
+            with io.open(filename, "w", encoding="latin-1") as fil:
+                fil.write(ex.str_result)
+            
+        
+        
 
 if __name__ == "__main__":
     Main(sys.argv[0], sys.argv[1:]).main()
