@@ -24,6 +24,10 @@ class CommandGenerator:
         return lim_switch + ['-unit', name]
 
     @staticmethod
+    def get_cmd_remove_individual(name:str) -> [str]:
+        return ['-remove', name]
+
+    @staticmethod
     def get_cmd_set_textlevel(n:str, textlevel:str = 'normal') -> [str]:
         return ['-modify', n, '-textlevel', textlevel]
         
@@ -81,11 +85,19 @@ class CommandGenerator:
 
         return res
 
-    def add(self, name:[str], lim:str = "1") -> [str]:
+    def add_indv(self, name:[str], lim:str = "1", extra_args:[str] = []) -> [str]:
         res = []
         for member in self.settings.expand_to_individuals(name):
             if self.display_output.get_individual(member) is None:               
-                res.append(CommandGenerator.get_cmd_add_individual(member, lim))
+                res.append(CommandGenerator.get_cmd_add_individual(member, lim) + extra_args)
+
+        return res
+
+    def remove(self, name:[str]) -> [str]:
+        res = []
+        for member in self.settings.expand_to_individuals(name):
+            if self.display_output.get_individual(member) is None:               
+                res.append(CommandGenerator.get_cmd_remove_individual(member))
 
         return res
 

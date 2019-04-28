@@ -5,6 +5,8 @@ class CommandLineParser:
         self.original_args = argv
         self.argv = argv
    
+    
+
     def get_args(self, name:str, default_value:str = None) -> [str]:
         return CommandLineParser.get_argument(name, self.argv, default_value)
 
@@ -18,6 +20,11 @@ class CommandLineParser:
 
     def replace_arg(self, name:str, val:[str]) -> 'CommandLineParser':
         return CommandLineParser(self.program_name, CommandLineParser.replace_argument(name, self.argv, val))
+
+    def remove_arg(self, *names:[str]) -> 'CommandLineParser':
+        for n in names:
+            return self.replace_arg(n, None)
+
 
     @staticmethod
     def find_arg_index(name:str, argv:[str]) -> (int,int, [str]):
@@ -64,19 +71,29 @@ class CommandLineParser:
         """ 
             Replaces switch 'name' with the supplied list. 
             :param val:
-                list to have no arguments, 
+                list with only 'name' to have no arguments, 
                 None to remove the switch all together
             :returns: the updated arguments
         """
         (start,stop, args) = CommandLineParser.find_arg_index(name, argv)
         if start < 0:
-            pass
-        elif val is None:
-            del(args[start:stop])
+            return args
+        
+        pre = args[:start-1] if start > 0 else []
+        post = args[stop+1:] if stop+1 < len(args) else []
+        if val is None or len(val) == 0:
+            return pre + post
         else:
-            args[start:stop] = val
-        return args
+            return pre + [val] + post
 
+
+
+    @property
+    def program_name(self) -> str:
+        return self.program_name
+
+    def set_program_name(self, new_name) -> 'CommandLineParser':
+        return CommandLineParser(new_name, self.argv)
 
     @property
     def is_empty(self) -> bool:
@@ -113,14 +130,33 @@ class CommandLineParser:
     def unit(self) -> str:
         return self.get_arg('unit')
     @property
+    def add(self) -> str:
+        return self.get_arg('add')
+    def add_extra_args(self) -> 'CommandLineParser':
+        return self.remove_arg('add', 'unit', 'lim')
+    @property
+    def remove(self) -> str:
+        return self.get_arg('remove')
+    def remove_extra_args(self) -> 'CommandLineParser':
+        return self.remove_arg('remove')
+    @property
     def start(self) -> str:
         return self.get_arg('start')
+
+    def start_extra_args(self) -> 'CommandLineParser' :
+        return self.remove_arg('start').remove_arg('lim').remove_arg('textlevel')
+
     @property
     def stop(self) -> str:
         return self.get_arg('stop')
+    def stop_extra_args(self) -> 'CommandLineParser' :
+        return self.remove_arg('stop').remove_arg('lim')
+
     @property
     def print(self) -> str:
         return self.get_arg('print')
+    def print_extra_args(self) -> 'CommandLineParser' :
+        return self.remove_arg('print').remove_arg('lim')
 
     @property
     def save(self) -> str:
@@ -131,7 +167,15 @@ class CommandLineParser:
     @property
     def save_postfix(self) -> str:
         return self.get_arg('postfix')
+    def save_extra_args(self) -> 'CommandLineParser' :
+        return self.remove_arg('save').remove_arg('prefix').remove_arg('postfix')
 
+    @property
+    def zip(self) -> str:
+        return self.get_arg('zip')
+    def zip_extra_args(self) -> 'CommandLineParser' :
+        return self.remove_arg('zip').save_extra_args()
+ 
     @property
     def signo(self) -> str:
         return self.get_arg('signo')
