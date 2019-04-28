@@ -60,7 +60,7 @@ class TestMain(unittest.TestCase):
         settings_json = """
 {
     "trace_cmd": "python",
-    "trace_args": ["trace_mockup_7x.py"],
+    "trace_args": ["tests/trace_mockup_7x.py"],
     "default_textlevel": "full",
     "gangs": [
         {

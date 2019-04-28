@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+import platform
 
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
@@ -21,9 +22,13 @@ class TestExecutor(unittest.TestCase):
         self.trace(4, 'setup done')
 
     def test_hello_world(self) -> None:
-        executor = Executor("echo", ["hello world"])
+
+        if platform.system() == "Windows":
+            executor = Executor("cmd", ["/C", "echo", "hello", "world"])
+        else:
+            executor = Executor("echo", ["hello", "world"])
         res = executor.str_result
-        self.assertEqual("hello world", str(res).strip())
+        self.assertEqual("hello world", res.strip())
 
     #def run_test_mockup(self, mxver:int, prog:str, args:[str]) -> str:
     #    executor = Executor(True, True, True, "trace-mockup")
