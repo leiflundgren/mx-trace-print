@@ -77,6 +77,12 @@ class Settings:
         """
         return self.data.get('save_postfix', '.log')
     
+    @property
+    def save_separators(self) -> str:
+        """
+            Which separators are allowed
+        """
+        return self.data.get('save_separators', '-_/=')
 
     @property
     def debug_trace_level(self) -> int:

@@ -1,5 +1,6 @@
 from parse_display import ParseDisplayOutput
 from tools import trace
+from settings import Settings
 import sys
 
 class CommandGenerator:
@@ -115,18 +116,17 @@ class CommandGenerator:
         return map(lambda i: self.get_cmd_clear(i), ids)
 
 
-
     ### Returns a list of tuples(print-cmd, target-filename)
     def save_cmd(self, names:[str], prefix:str = "", postfix:str = ".log", ) -> [(str, str)]:
         def gen_tuple(unitname, id):
             cmd = CommandGenerator.get_cmd_print(id)
             filename = (prefix+sep+unitname+postfix).strip(sep)
             return (cmd, filename)
-
-        if prefix[-1] == '-' or prefix[-1] == '_':
+        
+        if self.settings.save_separators.find(prefix[-1]):
             sep = prefix[-1]
             prefix = prefix[:-1]
-        elif postfix[0] == '-' or postfix[0] == '_':
+        elif self.settings.save_separators.find(postfix[0]):
             sep = postfix[0]
             postfix = postfix[1:]
         else:
