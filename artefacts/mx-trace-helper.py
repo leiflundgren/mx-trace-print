@@ -29,102 +29,183 @@ def _command_line_parser(__name__):
     ##----- Begin command_line_parser.py -----------------------------------------##
     
     class CommandLineParser:
-        def __init__(self, program_name:str, args:[str] ):
+        def __init__(self, program_name:str, argv:[str] ):
             self.program_name = program_name
-            self.verbatim_args = args
-            self.args = self.parse_command_line(args)
+            self.original_args = argv
+            self.argv = argv
+       
+        def get_args(self, name:str, default_value:str = None) -> [str]:
+            return CommandLineParser.get_argument(name, self.argv, default_value)
+    
+        def get_arg(self, name:str, default_value:str = None) -> str:
+            arg = self.get_args(name, default_value)
+            return None if arg is None or len(arg) == 0 else arg[0]
+        
+        def has_arg(self, name:str, default_value:str = None) -> bool:
+            arg_ls = self.get_args(name, default_value)
+            return not arg_ls is None
+    
+        def replace_arg(self, name:str, val:[str]) -> 'CommandLineParser':
+            return CommandLineParser(self.program_name, CommandLineParser.replace_argument(name, self.argv, val))
     
         @staticmethod
-        def parse_command_line(argv:[str]) -> None:
-            args = {}
-            i=1
+        def find_arg_index(name:str, argv:[str]) -> (int,int, [str]):
+            """
+                Finds between which indices that an argument is
+                This makes it possible to replace the argument with seomthing else
+                Returns start/stop indices and a list of the arguemnts
+            """
+            name = name.lower()
+            i=1 if len(argv) > 0 and argv[0][0] != '-' else 0
             while i < len(argv):
-                if argv[i][0] == "-":
-                    arg = argv[i].lstrip("-").rstrip().lower()
-                    val = []
-                    i=i+1
-                    while i < len(argv) and argv[i][0] != "-":
-                        val.append(argv[i].strip())
-                        i = i + 1
-                    args[arg] = val
+                if argv[i][0] != "-":
+                    i=i+i
+                    continue
+    
+                arg = argv[i].lstrip("-").rstrip().lower()
+                val = []
+                start = i
+                i=i+1
+                while i < len(argv) and argv[i][0] != "-":
+                    val.append(argv[i].strip())
+                    i = i + 1
+                if arg == name:
+                    return (start, i-1, val)
+    
+            return (-1, -1, None)
+    
+        @staticmethod
+        def get_argument(name:str, argv:[str], default_value:[str] = None) -> [str]:
+            """ Gets the arguments to switch 'name' as a list.
+            return: None is not found, otherwise a list. (If name is found but has no arguments, an empty list is returned.) """
+            (_start,_stop, args) = CommandLineParser.find_arg_index(name, argv)
+            if not args is None:
+                return args
+            if default_value is None:
+                return None
+            if isinstance(default_value, list):
+                return default_value
+            else:
+                return [default_value]
+    
+        @staticmethod
+        def replace_argument(name:str, argv:[str], val:[str]) -> [str]:
+            """ 
+                Replaces switch 'name' with the supplied list. 
+                :param val:
+                    list to have no arguments, 
+                    None to remove the switch all together
+                :returns: the updated arguments
+            """
+            (start,stop, args) = CommandLineParser.find_arg_index(name, argv)
+            if start < 0:
+                pass
+            elif val is None:
+                del(args[start:stop])
+            else:
+                args[start:stop] = val
             return args
+    
     
         @property
         def is_empty(self) -> bool:
-            return self.args.__len__() == 0
+            """ Considered empty is only program-name """
+            if len(self.argv) == 0:
+                return True
+            elif len(self.argv) == 1 and self.argv[0][0] != '-': 
+                return True # only prog-name
+            else:
+                return False
+    
+        @property
+        def settings_file(self) -> str:
+            return (
+                    self.get_arg('settings_file') 
+                    or  self.get_arg('settings')
+            )
     
         @property
         def help(self) -> bool:
-            return 'help' in self.args or 'h' in self.args
+            return self.has_arg('help') or self.has_arg('h')
     
         @property
-        def display(self) -> []:
-            return self.args.get('display', None)
+        def display(self) -> [str]:
+            """
+                :return: the optional argument to display [0,1..15]
+            """
+            return self.get_args('display')
     
         @property
         def lim(self) -> str:
-            return self.args.get('lim', None)
+            return self.get_arg('lim')
         @property
         def unit(self) -> str:
-            return self.args.get('unit', None)
+            return self.get_arg('unit')
         @property
         def start(self) -> str:
-            return self.args.get('start', None)
+            return self.get_arg('start')
         @property
         def stop(self) -> str:
-            return self.args.get('stop', None)
+            return self.get_arg('stop')
         @property
         def print(self) -> str:
-            return self.args.get('print', None)
+            return self.get_arg('print')
     
         @property
-        def print_prefix(self) -> str:
-            return self.args.get('prefix', None)
+        def save(self) -> str:
+            return self.get_arg('save')
         @property
-        def print_postfix(self) -> str:
-            return self.args.get('postfix', None)
+        def save_prefix(self) -> str:
+            return self.get_arg('prefix')
+        @property
+        def save_postfix(self) -> str:
+            return self.get_arg('postfix')
+    
         @property
         def signo(self) -> str:
-            return self.args.get('signo', None)
+            return self.get_arg('signo')
         @property
         def show(self) -> str:
-            return self.args.get('show', None)
+            return self.get_arg('show')
         @property
         def signal_from(self) -> str:
-            return self.args.get('from', None)
+            return self.get_arg('from')
         @property
         def signal_to(self) -> str:
-            return self.args.get('to', None)
+            return self.get_arg('to')
         @property
         def time_from(self) -> str:
-            return self.args.get('from', None)
+            return self.get_arg('from')
         @property
         def time_to(self) -> str:
-            return self.args.get('to', None)
+            return self.get_arg('to')
+        @property
+        def textlevel(self) -> str:
+            return self.get_arg('textlevel')        
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
         # @property
         # def xxx(self) -> str:
-        #     return self.args.get('xxx', None)
+        #     return self.argv.get('xxx', None)
     
     
     ##----- End command_line_parser.py -------------------------------------------##
@@ -149,14 +230,14 @@ def _tools(__name__):
                     return f.readlines()
         raise ValueError("Cannot read data from " + str(type(file_thing)))
     
-    def open_file(name) -> io.TextIOBase:
+    def open_read_file(name) -> io.TextIOBase:
         return open(name, "r", encoding='iso-8859-1')
     
     
     tracelevel = 4
     log_handle = None
     
-    def trace(level, *args):
+    def trace(level:int, *args, file=sys.stdout):
         def fix_linendings(s: str) -> str:
             if os.linesep == '\n':
                 return s
@@ -210,7 +291,7 @@ def _tools(__name__):
             msg += mystr(thing)
     
         msg = msg.rstrip()
-        handle = sys.stderr if log_handle is None else log_handle
+        handle = file if not file is None else ( sys.stderr if log_handle is None  else log_handle )
     
         try:
             print(msg, file=handle)
@@ -228,65 +309,614 @@ def _tools(__name__):
     ##----- End tools.py ---------------------------------------------------------##
     return locals()
 
+@modulize('parse_display')
+def _parse_display(__name__):
+    ##----- Begin parse_display.py -----------------------------------------------##
+    import io
+    from typing import List, Optional
+    import tools
+    
+    class ParseDisplayOutput:
+    
+        class Individual:
+            def __init__(self, dict) -> None:
+                self.dict = dict
+            def __str__(self) -> str:
+                return "{id}: {name} {state}".format(id=self.id, name=self.unit_name, state=self.state)
+    
+            def get(self, attrName) -> str:
+                val = self.dict.get(attrName)
+                return ( None if val is None else val.strip() )
+    
+            @property
+            def is_header(self) -> bool:
+                return self.dict.find('Version') is not None
+    
+            @property
+            def id(self) -> str:
+                return self.get('Trace ind')
+    
+            @property
+            def state(self) -> str:
+                return self.get('State')
+            @property
+            def stored(self) -> str:
+                return self.get('Stored')
+            @property
+            def size(self) -> str:
+                return self.get('Size per lim')
+         
+            @property
+            def trace_type(self) -> str:
+                return self.get('Type')
+            @property
+            def rotating(self) -> str:
+                return self.get('Rotating')
+            @property
+            def textlevel(self) -> str:
+                return self.get('Textlevel')
+            @property
+            def lim(self) -> str:
+                return self.get('Lim no')
+            @property
+            def unit_no(self) -> str:
+                return self.get('Unit no')
+            @property
+            def unit_name(self) -> str:
+                return self.get('Unit name')
+            @property
+            def time_mark(self) -> str:
+                return self.get('Time mark')
+            @property
+            def by_user(self) -> str:
+                return self.get('by user')
+            # @property
+            # def (self) -> str:
+            #     return self.dict[''].strip()
+                        
+    
+        def __init__(self, source) -> None:
+            self.source = tools.read(source)
+            if isinstance(self.source, str):
+                self.source = self.source.splitlines()
+    
+            self.individuals : List[ParseDisplayOutput.Individual] = [] 
+            parts : List[str] = []
+    
+            in_header = True
+            for line in self.source:
+                line = line.strip()
+                
+                ## skip header, until a line starts with Version
+                if in_header:
+                    if line.startswith('Version'):
+                        in_header = False
+                    else:
+                        continue
+    
+                if line.startswith('Version'):
+                    mpos = line.index(', Market:')
+                    self.version = line[8:mpos].strip()
+                    self.market = line[mpos+9:].strip()
+                    continue
+            
+                if line.startswith('First'):
+                    last = line.find('Last:')-1
+                    while last > 0 and line[last] == ' ':
+                        last=last-1
+                    if last>0 and line[last] != ',':
+                        line = line[:last+1] + ',' + line[last+1:]
+                
+                if len(line) > 0 :
+                    parts.extend(map(str.strip, line.split(',')))
+                else:
+                    individual = self.parse_individual(parts)
+                    if individual is not None:
+                        self.individuals.append(individual)
+                    parts = []
+    
+        def __str__(self) -> str:
+            return  "\n".join( [str(i) for i in self.individuals ] )
+    
+        @property
+        def first_trace(self) -> str:
+            return self.individuals[0].get('First')
+        @property
+        def last_trace(self) -> str:
+            return self.individuals[0].get('Last')
+    
+    
+        def get_individual(self, id) -> 'Individual':
+            if isinstance(id, int):
+                return self.individuals[id] if id < len(self.individuals) else None
+            for ind in self.individuals[1:]: # Avoid header
+                if ind.id == id or ind.unit_name == id:
+                    return ind
+            return None
+    
+        ### convenience method that returns the id of Individual matching unitname, or None
+        def get_id(self, unitname) -> [str]:
+            ind = self.get_individual(unitname)
+            return ind.id if not ind is None else None
+    
+        ## Trace ind:  3, State: setup       , Stored:      0, Size per lim: 5000,  Type     : unit-trace      , Rotating: on , Textlevel: all, Lim no   :   1, Unit no: 0206, Unit name: CMP , Time mark: 2018-12-13 16:46:11 (CET), by user: mxone_admin
+        @staticmethod
+        def parse_individual(parts) -> 'Individual':
+            d = dict(map(str.strip, itm.split(':', 1)) for itm in parts)
+            return ParseDisplayOutput.Individual(d) if len(d) > 0 else None
+    
+    ##----- End parse_display.py -------------------------------------------------##
+    return locals()
+
+@modulize('command_generator')
+def _command_generator(__name__):
+    ##----- Begin command_generator.py -------------------------------------------##
+    from parse_display import ParseDisplayOutput
+    from tools import trace
+    import sys
+    
+    class CommandGenerator:
+    
+        def __init__(self, display_output:ParseDisplayOutput, settings:'Settings'):
+            self.display_output = display_output
+            self.mx_version = self.display_output.version
+            self.settings = settings
+            pass
+    
+        @property
+        def trace_cmd(self) -> str:
+            return self.settings.trace_cmd
+        @property
+        def trace_prefix_args(self) -> [str]:
+            return self.settings.trace_args
+    
+        @staticmethod
+        def get_cmd_add_individual(name:str, lim:str) -> [str]:
+            lim_switch = [] if lim is None else ['-lim', lim]
+            return lim_switch + ['-unit', name]
+    
+        @staticmethod
+        def get_cmd_set_textlevel(n:str, textlevel:str = 'normal') -> [str]:
+            return ['-modify', n, '-textlevel', textlevel]
+            
+        @staticmethod
+        def get_cmd_start(n_list:[str]) -> [str]:
+            return ['-start', ",".join(n_list) ]
+        @staticmethod
+        def get_cmd_stop(n_list:[str]) -> [str]:
+            return ['-stop', ",".join(n_list) ]
+        @staticmethod
+        def get_cmd_clear(n_list:[str]) -> [str]:
+            return ['-clear', ",".join(n_list) ]
+        
+        @staticmethod
+        def get_cmd_print(unit_id:str) -> [str]:
+            return ['-print', unit_id ]
+    
+        def expand_names(self, name_or_list) -> [str]:
+            def expand_ranges(ls:[str]) -> [str]:
+                res = []
+                for s in ls:
+                    for s2 in s.split(','):
+                        dash = s2.find('-')
+                        if dash > 0:
+                            n1 = s2[:dash]
+                            n2 = s2[dash+1:]
+                            r = list(map( str, range(int(n1), int(n2)+1)))
+                            res += r
+                        else:
+                            res.append(s2)
+                return res
+    
+    
+            res = []
+    
+            ls = name_or_list if isinstance(name_or_list, list) else [name_or_list]
+            ls = expand_ranges(ls)
+            for name in ls:
+                # if name is not gang, assume unit-name
+                gang = self.settings.get_gang(name)
+                if not gang is None:
+                    res +=self.expand_names(gang)
+                else:
+                    res.append(name)
+            return res
+    
+        def get_ids_of(self, name_or_list) -> [str]:
+            res = []
+            for name in self.expand_names(name_or_list):
+                ind = self.display_output.get_individual(name)
+                if ind is None:
+                    trace(2, "Unknown unit '" + name + "', ignored")
+                    continue
+                res.append(ind.id)
+    
+            return res
+    
+        def add(self, name:[str], lim:str = "1") -> [str]:
+            res = []
+            for member in self.settings.expand_to_individuals(name):
+                if self.display_output.get_individual(member) is None:               
+                    res.append(CommandGenerator.get_cmd_add_individual(member, lim))
+    
+            return res
+    
+        def set_textlevel(self, name:[str], textlevel:str = 'normal') -> [str]:
+            res = []
+            
+            for member in self.settings.expand_to_individuals(name):
+                indv = self.display_output.get_individual(member)
+                if indv is None:
+                    trace(2, "Unknown gang-member '" + member + "' Textlevel not changed")
+                    continue
+                id = indv.id
+                res.append(CommandGenerator.get_cmd_set_textlevel(id, textlevel))
+            
+            return res 
+    
+    
+        def start(self, name:[str]) -> [str]:
+            ids = self.get_ids_of(name)
+            return map(lambda i: self.get_cmd_start(i), ids)
+    
+        def stop(self, name:[str]) -> [str]:
+            ids = self.get_ids_of(name)
+            return map(lambda i: self.get_cmd_stop(i), ids)
+    
+        def clear(self, name:[str]) -> [str]:
+            ids = self.get_ids_of(name)
+            return map(lambda i: self.get_cmd_clear(i), ids)
+    
+    
+    
+        ### Returns a list of tuples(print-cmd, target-filename)
+        def save_cmd(self, names:[str], prefix:str = "", postfix:str = ".log", ) -> [(str, str)]:
+            def gen_tuple(unitname, id):
+                cmd = CommandGenerator.get_cmd_print(id)
+                filename = (prefix+sep+unitname+postfix).strip(sep)
+                return (cmd, filename)
+    
+            sep = '-' if prefix.find('-') >= 0 or postfix.find('-') >= 0 else '_'
+            
+            res = []
+    
+            for name in self.expand_names(names):
+                id = self.display_output.get_id(name)
+                if id is None:
+                    trace(2, "print_cmd: unknown unit " + name + ", not printed", file=sys.stderr)
+                    continue
+                res.append(gen_tuple(name, id))
+            return res
+    
+        ### Returns a list print-cmd
+        def print_cmd(self, names:[str]) -> [str]:
+            res = []
+    
+            for name in names:
+                id = self.display_output.get_id(name)
+                if id is None:
+                    trace(2, "print_cmd: unknown unit " + name + ", not printed", file=sys.stderr)
+                    continue
+                cmd = CommandGenerator.get_cmd_print(id)
+                res.append(cmd)
+            return res
+    
+    ##----- End command_generator.py ---------------------------------------------##
+    return locals()
+
 @modulize('settings')
 def _settings(__name__):
     ##----- Begin settings.py ----------------------------------------------------##
     import json
     import io
     import tools
+    import os.path
+    import re
     
     class Settings:
     
-        def __init__(self, settings_file):                
+        def __init__(self, settings_file):
             if isinstance(settings_file, io.TextIOBase):
-                self.data = json.load(settings_file)
-            elif isinstance(settings_file, str) and settings_file.count('\n') > 1:
-                self.data = json.load(io.StringIO(settings_file))
+                self.__init__(settings_file.read())
+                return
+            elif isinstance(settings_file, str) and (settings_file.count('\n') > 1 or not os.path.exists(settings_file) ):
+                trimmed = Settings.trim_json_comments(settings_file)
+                self.data = json.load(io.StringIO(trimmed))
+                tools.tracelevel = self.debug_trace_level
             elif isinstance(settings_file, str):
-                with tools.open_file(settings_file) as f:
-                    self.data = json.load(f)
+                with tools.open_read_file(settings_file) as f:
+                    self.__init__(f.read())
+                    return
     
+        @staticmethod
+        def trim_json_comments(data_string):
+            result = []
+            for line in data_string.split("\n"):
+                stripped = line.strip()
+                if len(stripped) < 1 or stripped[0:2] == "//":
+                    line = "" # remove
+                elif line[-1] not in r"\,\"\'":
+                    line = re.sub(r"\/\/.*?$", "", line)
+                result.append(line)
+            return "\n".join(result)
     
-    
-        def get_gang(self, name) -> [str] :
+        def get_gang(self, name) -> [str]:
             gangs_list = self.data['gangs']
             for g in gangs_list:
                 if g['name'] == name:
                     return g['members']
             return None
     
-        
+        def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
+            res = []
+            ls = ids_or_gangs if isinstance(ids_or_gangs, list) else [ids_or_gangs]
+            for id in ls:
+                members = self.get_gang(id) or [id]
+                res.extend(members)
+            return res
+    
+    
         @property
         def default_textlevel(self) -> str:
-            return self.data.find('default_textlevel') # none means "default"
+            return self.data.get('default_textlevel', 'default')  # none means "default"
     
         @property
         def trace_cmd(self) -> str:
-            return self.data['trace_cmd'] or 'trace'
+            return self.data.get('trace_cmd', 'trace')
     
+        @property
+        def trace_args(self) -> [str]:
+            """
+                If out trace-command requires some extra prefixed arguments. 
+                :returns: list might be empty, but never none
+            """
+            return self.data.get('trace_args', [])
+    
+        @property
+        def save_prefix(self) -> str:
+            """
+                Prefix for trace output files
+            """
+            return self.data.get('save_prefix', 'trace_mx_')
+    
+        @property
+        def save_postfix(self) -> str:
+            """
+                Postfix for trace output files
+            """
+            return self.data.get('save_postfix', '.log')
         
+    
+        @property
+        def debug_trace_level(self) -> int:
+            return self.data.get('debug_trace_level', 7)
+    
+        @property
+        def debug_trace_commands(self) -> int:
+            return self.data.get('debug_trace_commands', 7)
+    
+        @property
+        def debug_trace_output(self) -> int:
+            v = self.data.get('debug_trace_output')
+            return v is not v is None or self.debug_trace_output
+    
     ##----- End settings.py ------------------------------------------------------##
     return locals()
 
+@modulize('executor')
+def _executor(__name__):
+    ##----- Begin executor.py ----------------------------------------------------##
+    from tools import trace
+    from tools import tracelevel
+    from parse_display import ParseDisplayOutput
+    from command_generator import CommandGenerator
+    
+    import subprocess 
+    import sys 
+    
+    class Executor:
+        def __init__(self, program:str, args:[str], trace_cmd_level:int = 7, trace_result_level:int = 8):
+            self.program = program
+            self.args = args
+            prog_args = [self.program]
+            if not args is None: prog_args += args
+            
+            trace(trace_cmd_level, 'Executor ' + program, args)
+            try:
+                self.result = subprocess.check_output(prog_args)
+                if tracelevel >= trace_result_level:
+                    trace(trace_result_level, self.str_result)
+            except subprocess.CalledProcessError as e:
+                trace(1, e.cmd, 'failed with ', e.returncode)
+                trace(1, e.output)
+                sys.exit(e.returncode)
+    
+        @property
+        def str_result(self):
+            return self.result.decode() if isinstance(self.result, bytes) else self.result
+    
+    
+    ##----- End executor.py ------------------------------------------------------##
+    return locals()
 
-def __main__():
-    ##----- Begin __main__.py ----------------------------------------------------##
+@modulize('main')
+def _main(__name__):
+    ##----- Begin main.py --------------------------------------------------------##
     import sys
     
     from command_line_parser import CommandLineParser
+    from command_generator import CommandGenerator
     from settings import Settings
     from tools import trace
+    from executor import Executor
+    from parse_display import ParseDisplayOutput
+    import io
+    import os
     
     class Main:
-        def __init__(self, program_name, argv:[str]) -> None:
+        def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
             self.command_line = CommandLineParser(program_name, argv)
+            self.settings = settings or Main.find_settings(self.command_line.settings_file)
+            self.parsed_display : ParseDisplayOutput = None
+            self.command_generator : CommandGenerator = None
     
-        def main(self):
-            trace(1, "placeholder for main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.verbatim_args)+ " ]")
+        def set_parsed_display(self, val:ParseDisplayOutput):
+            self.parsed_display = val
+            self.command_generator = CommandGenerator(val, self.settings)
+    
+        def execute(self, args:[str]) -> 'Executor':        
+            return Executor(self.settings.trace_cmd, self.settings.trace_args + args, trace_cmd_level=self.settings.debug_trace_commands)
+    
+        def execute_all(self, list_of_args:[[str]]) -> str:
+            if not isinstance(list_of_args, list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
+            if not isinstance(list_of_args[0], list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
+    
+            return "\n".join([self.execute(arg).str_result for arg in list_of_args])
+    
+    
+        @staticmethod 
+        def find_settings(file:str = None) -> str:
+            ex = None
+            files = [
+                file,            
+                os.path.join( os.path.dirname(os.path.realpath(__file__)), 'settings.json'),
+                os.path.join( os.path.expanduser("~"), '.mx-trace', 'settings.json'),
+                os.path.join( os.path.expanduser("~"), '.mx-trace.json')
+            ] 
+            for f in files:
+                if not f is None and os.path.exists(f):
+                    try:
+                        return Settings(f)
+                    except BaseException as ex:
+                        trace(3, "Failed to open settings from " + f + ": " + str(ex))                    
+    
+            trace(3, "Failed to open settings from any known file " + "\n   " + "\n   ".join(files) )
+            return Settings("{\n}") # Return empty settings
+                
+    
+        def main(self) -> str:
+            trace(7, "main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.original_args)+ " ]")
+            display_args = self.command_line.display
+            if not display_args is None:
+                trace(3, "display " + " ".join(display_args), file=sys.stderr)
+                self.call_display(display_args)
+                print(self.parsed_display)
+                return
+    
+            start_args = self.command_line.start
+            if not start_args is None:
+                trace(3, "start " + " ".join(start_args))
+                self.call_display()
+                self.call_start(start_args.split(','), self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel)
+                return
+    
+            stop_args = self.command_line.stop
+            if not stop_args is None:
+                trace(3, "stop " + " ".join(stop_args))
+                self.call_display()
+                self.call_stop(stop_args.split(','))
+                return
+    
+            print_args = self.command_line.print
+            if not print_args is None:
+                trace(3, "print " + " ".join(print_args))
+                self.call_display()
+                printout = self.call_print(print_args.split(','))
+                print(printout)
+                return printout
+    
+            save_args = self.command_line.save
+            if not save_args is None:
+                prefix=self.command_line.save_prefix or self.settings.save_prefix
+                postfix=self.command_line.save_postfix or self.settings.save_postfix
+                trace(3, "save " + save_args , ", prefix=" , prefix , ", postfix=" , postfix)
+                self.call_display()
+                self.call_save(save_args.split(','), prefix, postfix)
+    
+            
+    
+        def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
+            if len(ids_or_gangs) == 0 or ids_or_gangs[0].lower() == 'all':
+                return [str(indv) for indv in self.parsed_display.individuals]
+            else:
+                return self.settings.expand_to_individuals(ids_or_gangs)
+    
+        def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':        
+            disp_output = self.execute(['-display'] + args).str_result
+            self.set_parsed_display(ParseDisplayOutput(disp_output))
+    
+        def ensure_individuals_exists(self, id_names:[str], lim:str, textlevel:str):
+            if len(id_names) == 0 or id_names[0].lower() == 'all':
+                id_names = [str(indv) for indv in self.parsed_display.individuals]
+            else:
+                id_names = self.settings.expand_to_individuals(id_names)
+            f = filter(lambda id: self.parsed_display.get_individual(id) is None, id_names)        
+            undef_indv = list(f)
+            if not undef_indv:
+                return
+            self.add_individuals(undef_indv, lim, textlevel)
+    
+        def add_individuals(self, individuals:[str], lim:str, textlevel:str):
+            trace(4, "Adding individuals ", individuals)
+            self.execute_all(self.command_generator.add(individuals, lim))
+    
+            self.call_display()
+    
+            for id in individuals:
+                indv = self.parsed_display.get_individual(id)
+                if indv is None:
+                    trace(2, 'Failed to create induvidual ' + id)
+                    sys.exit(17)
+                if indv.textlevel != textlevel:
+                    self.execute_all(self.command_generator.set_textlevel(id, textlevel))
+                
+    
+        def call_start(self, args:[str], lim:str, textlevel:str):
+            if self.parsed_display is None:
+                raise ValueError("Called start when no display parser yet!")
+            individuals = self.expand_to_individuals(args)
+            self.ensure_individuals_exists(individuals, lim, textlevel)
+            start_cmds = self.command_generator.start(individuals)
+            for indv_start in start_cmds:
+                self.execute(indv_start)
+        
+        def call_stop(self, args:[str]):
+            if self.parsed_display is None:
+                raise ValueError("Called stop when no display parser yet!")
+            individuals = self.expand_to_individuals(args)
+            existing = filter(lambda id: not self.parsed_display.get_individual(id) is None, individuals)        
+            stop_cmds = self.command_generator.stop(existing)
+            for indv_stop in stop_cmds:
+                self.execute(indv_stop)
+    
+        def call_print(self, args:[str]) -> str:
+            if self.parsed_display is None:
+                raise ValueError("Called print when no display parser yet!")
+            individuals = self.expand_to_individuals(args)
+            existing = filter(lambda id: not self.parsed_display.get_individual(id) is None, individuals)        
+            print_cmds = self.command_generator.print_cmd(existing)
+            return self.execute_all(print_cmds)
+        
+        def call_save(self, args:[str], prefix, postfix) -> str:
+            if self.parsed_display is None:
+                raise ValueError("Called print when no display parser yet!")
+            individuals_names = self.expand_to_individuals(args)
+            individuals = map(lambda id: self.parsed_display.get_individual(id), individuals_names)
+            
+            existing_individuals = filter(lambda indv: not indv is None, individuals)        
+            
+            for indv in existing_individuals:
+                (print_cmd, filename) = self.command_generator.save_cmd([indv.unit_name], prefix, postfix)[0]        
+                trace(3, 'printing ' + indv.id + "/" + indv.unit_name + " to " + filename)
+                ex = self.execute(print_cmd)
+                with io.open(filename, "w", encoding="latin-1") as fil:
+                    fil.write(ex.str_result)
+                
+            
+            
     
     if __name__ == "__main__":
         Main(sys.argv[0], sys.argv[1:]).main()
     
-    ##----- End __main__.py ------------------------------------------------------##
-
-__main__()
+    ##----- End main.py ----------------------------------------------------------##
+    return locals()
