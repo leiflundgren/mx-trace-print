@@ -123,8 +123,15 @@ class CommandGenerator:
             filename = (prefix+sep+unitname+postfix).strip(sep)
             return (cmd, filename)
 
-        sep = '-' if prefix.find('-') >= 0 or postfix.find('-') >= 0 else '_'
-        
+        if prefix[-1] == '-' or prefix[-1] == '_':
+            sep = prefix[-1]
+            prefix = prefix[:-1]
+        elif postfix[0] == '-' or postfix[0] == '_':
+            sep = postfix[0]
+            postfix = postfix[1:]
+        else:
+            sep = '_'
+
         res = []
 
         for name in self.expand_names(names):
