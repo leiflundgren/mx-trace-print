@@ -84,14 +84,14 @@ Switches not used by this program should be passed down to trace
         trace(7, "main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.original_args)+ " ]")
 
         display_settings = self.command_line.display_settings
-        if not display_settings is None:
+        if  display_settings:
             return self.call_display_settings()
 
         if self.command_line.gangs_request:
             return self.call_display_gangs()
 
         help_args = self.command_line.help
-        if not help_args is None:
+        if help_args:
             return self.call_help()
         display_args = self.command_line.display
         if not display_args is None:
@@ -154,9 +154,12 @@ Switches not used by this program should be passed down to trace
         if not zip_args is None:
             prefix = self.command_line.file_prefix or self.settings.zip_prefix
             postfix = self.command_line.file_postfix or self.settings.zip_postfix
-            trace(3, "zip " + zip_args , ", prefix=" , prefix , ", postfix=" , postfix)
             zip_file = zip_args[0]
+            _ignored , file_extension = os.path.splitext(zip_file)
+            if len(file_extension) == 0:
+                zip_file = zip_file.rstrip('.') + '.zip' 
             individuals = zip_args[1:]
+            trace(3, "zip ", individuals, " to ", zip_file , ", prefix=" , prefix , ", postfix=" , postfix)
             self.call_display()
             self.call_zip(individuals, zip_file, prefix, postfix)
             return
@@ -169,25 +172,36 @@ Switches not used by this program should be passed down to trace
     def expand_to_ids(self, ids_or_gangs:[str]) -> str:
         if isinstance(ids_or_gangs, str): # Handle if list forgotten
             ids_or_gangs = [ids_or_gangs]
-        ids_or_gangs = [item for sublist in ids_or_gangs.split(',') for item in sublist] 
+        list_of_lists = [ iog.split(',') for iog in ids_or_gangs]
+        ids_or_gangs =  [val for sublist in list_of_lists for val in sublist]
 
         if len(ids_or_gangs) == 0 or ids_or_gangs[0].lower() == 'all':
             return [str(indv) for indv in self.parsed_display.individuals]
         else:
             return self.settings.expand_to_ids(ids_or_gangs)
 
-    def get_existing_individuals(self, id_names:[str]) -> [str]:
+    def get_existing_ids(self, id_names:[str]) -> [str]:
+        return map( lambda indv: indv.id, self.get_existing_indivuduals(id_names))
+        # if len(id_names) == 0 or id_names[0].lower() == 'all':
+        #     id_names = [str(indv) for indv in self.parsed_display.individuals]
+        # else:
+        #     id_names = self.settings.expand_to_ids(id_names)
+        # return list(filter(lambda id: not self.parsed_display.get_individual(id) is None, id_names))
+
+    def get_existing_indivuduals(self, id_names:[str]) -> ['ParseDisplayOutput.Individual']:
         if len(id_names) == 0 or id_names[0].lower() == 'all':
             id_names = [str(indv) for indv in self.parsed_display.individuals]
         else:
-            id_names = self.settings.expand_to_individuals(id_names)
-        return list(filter(lambda id: not self.parsed_display.get_individual(id) is None, id_names))
+            id_names = self.settings.expand_to_ids(id_names)
+        individuals = map(lambda id: self.parsed_display.get_individual(id), id_names)
+        return [x for x in individuals if x is not None]
+        #return list(filter(lambda indv: not self.parsed_display.get_individual(id) is None, id_names))
 
     def get_non_existing_individuals(self, id_names:[str]) -> [str]:
         if len(id_names) == 0 or id_names[0].lower() == 'all':
             id_names = [str(indv) for indv in self.parsed_display.individuals]
         else:
-            id_names = self.settings.expand_to_individuals(id_names)
+            id_names = self.settings.expand_to_ids(id_names)
         return list(filter(lambda id: self.parsed_display.get_individual(id) is None, id_names))
 
     def ensure_individuals_exists(self, id_names:[str], lim:str, textlevel:str, extra_args:[str]):
@@ -235,7 +249,7 @@ Switches not used by this program should be passed down to trace
     def call_remove(self, args:[str], extra_args:[str] = []):
         if self.parsed_display is None:
             raise ValueError("Called start when no display parser yet!")
-        existing = self.get_existing_individuals(self.expand_to_ids(args))
+        existing = self.get_existing_ids(self.expand_to_ids(args))
         remove_cmds = self.command_generator.remove(existing)
         for indv_stop in remove_cmds:
             self.execute(indv_stop + extra_args)
@@ -251,7 +265,7 @@ Switches not used by this program should be passed down to trace
         if self.parsed_display is None:
             raise ValueError("Called stop when no display parser yet!")
         individuals = self.expand_to_ids(args)
-        existing = self.get_existing_individuals(individuals)
+        existing = self.get_existing_ids(individuals)
         stop_cmds = self.command_generator.stop(existing)
         for indv_stop in stop_cmds:
             self.execute(indv_stop + extra_args)
@@ -270,7 +284,7 @@ Switches not used by this program should be passed down to trace
         individuals_names = self.expand_to_ids(args)
         individuals = map(lambda id: self.parsed_display.get_individual(id), individuals_names)
         
-        existing_individuals = self.get_existing_individuals(individuals)
+        existing_individuals = self.get_existing_ids(individuals)
         
         # extra_args = self.command_line.get_non_save()
 
@@ -282,12 +296,13 @@ Switches not used by this program should be passed down to trace
                 fil.write(ex.str_result + extra_args)
             
     def call_zip(self, args:[str], zipfilename, prefix, postfix, extra_args:[str] = []) -> str:
+        if not isinstance(args, list): 
+            raise ValueError('Should be called with list of individuals')
         if self.parsed_display is None:
             raise ValueError("Called print when no display parser yet!")
         individuals_names = self.expand_to_ids(args)
-        individuals = map(lambda id: self.parsed_display.get_individual(id), individuals_names)
         
-        existing_individuals = self.get_existing_individuals(individuals)
+        existing_individuals = self.get_existing_indivuduals(individuals_names)
         
         # extra_args = self.command_line.get_non_zip()
 
@@ -299,11 +314,11 @@ Switches not used by this program should be passed down to trace
                 
                 z.writestr(filename, ex.result)
 
-        trace(5, "Wrote to " + zipfile)
+        trace(5, "Wrote to " + zipfilename)
         try:
-            trace(5, "Size became " + str(os.path.getsize(zipfile)))
+            trace(5, "Size became " + str(os.path.getsize(zipfilename)))
         except:
-            trace(1, "Failed to save data to " + zipfile)
+            trace(1, "Failed to save data to " + zipfilename)
 
     
     def expand_first_gang_in_commandline(self, args):

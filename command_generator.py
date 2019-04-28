@@ -135,10 +135,10 @@ class CommandGenerator:
             filename = (prefix+sep+unitname+postfix).strip(sep)
             return (cmd, filename)
         
-        if self.settings.save_separators.find(prefix[-1]):
+        if self.settings.file_separators.find(prefix[-1]) >= 0:
             sep = prefix[-1]
             prefix = prefix[:-1]
-        elif self.settings.save_separators.find(postfix[0]):
+        elif self.settings.file_separators.find(postfix[0]) >= 0:
             sep = postfix[0]
             postfix = postfix[1:]
         else:
