@@ -1,4 +1,7 @@
 import sys
+import io
+import os
+import zipfile
 
 from command_line_parser import CommandLineParser
 from command_generator import CommandGenerator
@@ -6,10 +9,37 @@ from settings import Settings
 from tools import trace
 from executor import Executor
 from parse_display import ParseDisplayOutput
-import io
-import os
 
 class Main:
+
+    help_str = \
+"""
+trace-helper, can call and group calls to MX-trace.
+If starting something not yet defined, it is auto-defined.
+Possible to start/stop/print on name, not only ID.
+Possible to configure groups if units, all listening to the same name
+Switches not used by this program should be passed down to trace
+
+  Many settings have default values, change ~/.mx-trace.json
+  -display_settings to output current settings-file
+
+  -gangs Prints which gangs are defined
+
+  -add indivuduals_or_gang   (same as -unit in trace)
+  -remove indivuduals_or_gang   
+  -start indivuduals_or_gang 
+  -stop indivuduals_or_gang 
+  -clear indivuduals_or_gang   
+  -print indivuduals_or_gang   
+  -save indivudual_or_gang -prefix trace -postfix log
+        Print all the individuals to separate files, with specified prefix/postfix. (Prefix might include paths)
+  -zip output_file.zip indivudual_or_gang
+        Like save, but generate 1 zip file with all traces
+
+  If specifying many individuals/gangs, separate with space
+
+"""    
+
     def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
         self.command_line = CommandLineParser(program_name, argv)
         self.settings = settings or Main.find_settings(self.command_line.settings_file)
@@ -52,6 +82,17 @@ class Main:
 
     def main(self) -> str:
         trace(7, "main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.original_args)+ " ]")
+
+        display_settings = self.command_line.display_settings
+        if not display_settings is None:
+            return self.call_display_settings()
+
+        if self.command_line.gangs_request:
+            return self.call_display_gangs()
+
+        help_args = self.command_line.help
+        if not help_args is None:
+            return self.call_help()
         display_args = self.command_line.display
         if not display_args is None:
             trace(3, "display " + " ".join(display_args), file=sys.stderr)
@@ -102,32 +143,38 @@ class Main:
 
         save_args = self.command_line.save
         if not save_args is None:
-            prefix=self.command_line.save_prefix or self.settings.save_prefix
-            postfix=self.command_line.save_postfix or self.settings.save_postfix
+            prefix=self.command_line.file_prefix or self.settings.save_prefix
+            postfix=self.command_line.file_postfix or self.settings.save_postfix
             trace(3, "save " + save_args , ", prefix=" , prefix , ", postfix=" , postfix)
             self.call_display()
             self.call_save(save_args.split(','), prefix, postfix)
+            return
 
         zip_args = self.command_line.zip
         if not zip_args is None:
-            prefix=self.command_line.zip_prefix or self.settings.zip_prefix
-            postfix=self.command_line.zip_postfix or self.settings.zip_postfix
+            prefix = self.command_line.file_prefix or self.settings.zip_prefix
+            postfix = self.command_line.file_postfix or self.settings.zip_postfix
             trace(3, "zip " + zip_args , ", prefix=" , prefix , ", postfix=" , postfix)
+            zip_file = zip_args[0]
+            individuals = zip_args[1:]
             self.call_display()
-            self.call_zip(zip_args.split(','), prefix, postfix)
+            self.call_zip(individuals, zip_file, prefix, postfix)
+            return
 
+        trace(2, 'Unknown command, calling trace verbatim for all individuals')
+        self.call_display()
+        self.call_unknown_command()
+        return
 
-        
+    def expand_to_ids(self, ids_or_gangs:[str]) -> str:
+        if isinstance(ids_or_gangs, str): # Handle if list forgotten
+            ids_or_gangs = [ids_or_gangs]
+        ids_or_gangs = [item for sublist in ids_or_gangs.split(',') for item in sublist] 
 
-    def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
         if len(ids_or_gangs) == 0 or ids_or_gangs[0].lower() == 'all':
             return [str(indv) for indv in self.parsed_display.individuals]
         else:
-            return self.settings.expand_to_individuals(ids_or_gangs)
-
-    def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':
-        disp_output = self.execute(['-display'] + args).str_result
-        self.set_parsed_display(ParseDisplayOutput(disp_output))
+            return self.settings.expand_to_ids(ids_or_gangs)
 
     def get_existing_individuals(self, id_names:[str]) -> [str]:
         if len(id_names) == 0 or id_names[0].lower() == 'all':
@@ -145,6 +192,25 @@ class Main:
 
     def ensure_individuals_exists(self, id_names:[str], lim:str, textlevel:str, extra_args:[str]):
         self.add_individuals(self.get_non_existing_individuals(id_names), lim, textlevel, extra_args)
+ 
+    def call_display_gangs(self) -> str:        
+        res = "\n".join( [ (g['name'] + ": " + ", ".join(g['members'])) for g in self.settings.gangs])
+        print(res)
+        return res
+
+
+    def call_display_settings(self) -> str:
+        print(self.settings.raw_data)
+        return self.settings.raw_data
+
+    def call_help(self) -> str:
+        print(Main.help_str)
+        return Main.help_str
+
+    def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':
+        disp_output = self.execute(['-display'] + args).str_result
+        self.set_parsed_display(ParseDisplayOutput(disp_output))
+
 
     def add_individuals(self, individuals:[str], lim:str, textlevel:str, extra_args:[str]):
         trace(4, "Adding individuals ", individuals)
@@ -163,20 +229,20 @@ class Main:
     def call_add(self, args:[str], lim:str, textlevel:str, extra_args:[str] = []):
         if self.parsed_display is None:
             raise ValueError("Called start when no display parser yet!")
-        individuals = self.expand_to_individuals(args)
+        individuals = self.expand_to_ids(args)
         self.ensure_individuals_exists(individuals, lim, textlevel, extra_args)
 
     def call_remove(self, args:[str], extra_args:[str] = []):
         if self.parsed_display is None:
             raise ValueError("Called start when no display parser yet!")
-        existing = self.get_existing_individuals(self.expand_to_individuals(args))
+        existing = self.get_existing_individuals(self.expand_to_ids(args))
         remove_cmds = self.command_generator.remove(existing)
         for indv_stop in remove_cmds:
             self.execute(indv_stop + extra_args)
     
     def call_start(self, args:[str], lim:str, textlevel:str, extra_args:[str] = []):
         self.call_add(args, lim, textlevel)
-        individuals = self.expand_to_individuals(args)
+        individuals = self.expand_to_ids(args)
         start_cmds = self.command_generator.start(individuals)
         for indv_start in start_cmds:
             self.execute(indv_start + extra_args)
@@ -184,7 +250,7 @@ class Main:
     def call_stop(self, args:[str], extra_args:[str] = []):
         if self.parsed_display is None:
             raise ValueError("Called stop when no display parser yet!")
-        individuals = self.expand_to_individuals(args)
+        individuals = self.expand_to_ids(args)
         existing = self.get_existing_individuals(individuals)
         stop_cmds = self.command_generator.stop(existing)
         for indv_stop in stop_cmds:
@@ -193,7 +259,7 @@ class Main:
     def call_print(self, args:[str], extra_args:[str] = []) -> str:
         if self.parsed_display is None:
             raise ValueError("Called print when no display parser yet!")
-        individuals = self.expand_to_individuals(args)
+        individuals = self.expand_to_ids(args)
         existing = filter(lambda id: not self.parsed_display.get_individual(id) is None, individuals)        
         print_cmds = self.command_generator.print_cmd(existing)
         return self.execute_all(print_cmds + extra_args)
@@ -201,7 +267,7 @@ class Main:
     def call_save(self, args:[str], prefix, postfix, extra_args:[str] = []) -> str:
         if self.parsed_display is None:
             raise ValueError("Called print when no display parser yet!")
-        individuals_names = self.expand_to_individuals(args)
+        individuals_names = self.expand_to_ids(args)
         individuals = map(lambda id: self.parsed_display.get_individual(id), individuals_names)
         
         existing_individuals = self.get_existing_individuals(individuals)
@@ -215,25 +281,56 @@ class Main:
             with io.open(filename, "w", encoding="latin-1") as fil:
                 fil.write(ex.str_result + extra_args)
             
-    def call_zip(self, args:[str], prefix, postfix, extra_args:[str] = []) -> str:
+    def call_zip(self, args:[str], zipfilename, prefix, postfix, extra_args:[str] = []) -> str:
         if self.parsed_display is None:
             raise ValueError("Called print when no display parser yet!")
-        individuals_names = self.expand_to_individuals(args)
+        individuals_names = self.expand_to_ids(args)
         individuals = map(lambda id: self.parsed_display.get_individual(id), individuals_names)
         
         existing_individuals = self.get_existing_individuals(individuals)
         
         # extra_args = self.command_line.get_non_zip()
 
-        for indv in existing_individuals:
-            (print_cmd, filename) = self.command_generator.zip_cmd([indv.unit_name], prefix, postfix)[0]        
-            trace(3, 'printing ' + indv.id + "/" + indv.unit_name + " to " + filename)
-            ex = self.execute(print_cmd)
-            with io.open(filename, "w", encoding="latin-1") as fil:
-                fil.write(ex.str_result + extra_args)
-            
-        
-        
+        with zipfile.ZipFile(zipfilename, "w") as z:
+            for indv in existing_individuals:
+                (print_cmd, filename) = self.command_generator.save_cmd([indv.unit_name], prefix, postfix)[0]        
+                trace(3, 'printing ' + indv.id + "/" + indv.unit_name + " to " + filename)
+                ex = self.execute(print_cmd)
+                
+                z.writestr(filename, ex.result)
+
+        trace(5, "Wrote to " + zipfile)
+        try:
+            trace(5, "Size became " + str(os.path.getsize(zipfile)))
+        except:
+            trace(1, "Failed to save data to " + zipfile)
+
+    
+    def expand_first_gang_in_commandline(self, args):
+        for i, a in enumerate(args):
+            expanded = self.expand_to_ids(a)
+            if len(expanded) > 1:                
+                pre = args[:i] if i > 0 else []
+                post = args[i+1:] if i+1 < len(args) else []
+                return [ pre + [indv] + post for indv in expanded ]
+        return [args]
+
+    
+
+    def call_unknown_command(self):
+        def find_gang() -> (int, [str]):
+            for i, a in enumerate(self.command_line.argv[1:]):
+                gang = self.expand_to_ids(a)
+                if len(gang) > 0:
+                    pre = self.command_line.argv[:i] if i > 0 else []
+                    post = self.command_line.argv[i+1:] if i+1 < len(self.command_line.argv) else []
+                    return [ pre + [indv] + post for indv in gang ]
+            return None
+
+        gang_expanded = find_gang() or self.command_line.argv[1:]
+        for a in gang_expanded:
+            trace(4, a)
+            self.execute(a)
 
 if __name__ == "__main__":
     Main(sys.argv[0], sys.argv[1:]).main()

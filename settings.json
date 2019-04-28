@@ -17,7 +17,7 @@
     ],
     "save_prefix": "trace_mx_",
     "save_postfix": ".log",
-    "save_separators": "-_/=",
+    "file_separators": "-_/=",
     "debug_trace_level": 7,
     "debug_trace_commands": 6
 }

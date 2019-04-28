@@ -121,7 +121,7 @@ class ParseDisplayOutput:
         return None
 
     ### convenience method that returns the id of Individual matching unitname, or None
-    def get_id(self, unitname) -> [str]:
+    def get_id(self, unitname) -> str:
         ind = self.get_individual(unitname)
         return ind.id if not ind is None else None
 

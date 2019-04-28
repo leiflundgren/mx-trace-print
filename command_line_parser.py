@@ -117,6 +117,15 @@ class CommandLineParser:
         return self.has_arg('help') or self.has_arg('h')
 
     @property
+    def display_settings(self) -> bool:
+        return self.has_arg('display_settings') or self.has_arg('display-settings') or self.has_arg('displaysettings')
+
+    @property
+    def gangs_request(self) -> bool:
+        return self.has_arg('gangs') or self.has_arg('gang')
+
+
+    @property
     def display(self) -> [str]:
         """
             :return: the optional argument to display [0,1..15]
@@ -165,17 +174,17 @@ class CommandLineParser:
     def save(self) -> str:
         return self.get_arg('save')
     @property
-    def save_prefix(self) -> str:
+    def file_prefix(self) -> str:
         return self.get_arg('prefix')
     @property
-    def save_postfix(self) -> str:
+    def file_postfix(self) -> str:
         return self.get_arg('postfix')
     def save_extra_args(self) -> 'CommandLineParser' :
         return self.remove_arg('save').remove_arg('prefix').remove_arg('postfix')
 
     @property
-    def zip(self) -> str:
-        return self.get_arg('zip')
+    def zip(self) -> [str]:
+        return self.get_args('zip')
     def zip_extra_args(self) -> 'CommandLineParser' :
         return self.remove_arg('zip').save_extra_args()
  

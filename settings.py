@@ -11,6 +11,7 @@ class Settings:
             self.__init__(settings_file.read())
             return
         elif isinstance(settings_file, str) and (settings_file.count('\n') > 1 or not os.path.exists(settings_file) ):
+            self.raw_data = settings_file
             trimmed = Settings.trim_json_comments(settings_file)
             self.data = json.load(io.StringIO(trimmed))
             tools.tracelevel = self.debug_trace_level
@@ -31,14 +32,18 @@ class Settings:
             result.append(line)
         return "\n".join(result)
 
+    @property
+    def gangs(self) -> [{}]:
+        return self.data['gangs']
+
     def get_gang(self, name) -> [str]:
-        gangs_list = self.data['gangs']
+        gangs_list = self.gangs
         for g in gangs_list:
             if g['name'] == name:
                 return g['members']
         return None
 
-    def expand_to_individuals(self, ids_or_gangs:[str]) -> str:
+    def expand_to_ids(self, ids_or_gangs:[str]) -> str:
         res = []
         ls = ids_or_gangs if isinstance(ids_or_gangs, list) else [ids_or_gangs]
         for id in ls:
@@ -64,26 +69,39 @@ class Settings:
         return self.data.get('trace_args', [])
 
     @property
-    def save_prefix(self) -> str:
+    def file_prefix(self) -> str:
         """
             Prefix for trace output files
         """
-        return self.data.get('save_prefix', 'trace_mx_')
+        return self.data.get('file_prefix', 'trace_mx_')
 
     @property
-    def save_postfix(self) -> str:
+    def file_postfix(self) -> str:
         """
             Postfix for trace output files
         """
-        return self.data.get('save_postfix', '.log')
+        return self.data.get('file_postfix', '.log')
     
     @property
-    def save_separators(self) -> str:
+    def file_separators(self) -> str:
         """
             Which separators are allowed
         """
-        return self.data.get('save_separators', '-_/=')
+        return self.data.get('file_separators', '-_/=')
 
+    @property
+    def zip_prefix(self) -> str:
+        """
+            Prefix for trace output files
+        """
+        return self.data.get('zip_prefix', self.file_prefix)
+
+    @property
+    def zip_postfix(self) -> str:
+        """
+            Postfix for trace output files
+        """
+        return self.data.get('file_postfix', self.file_postfix)
     @property
     def debug_trace_level(self) -> int:
         return self.data.get('debug_trace_level', 7)
