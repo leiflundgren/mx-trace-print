@@ -41,9 +41,9 @@ class TestMain(unittest.TestCase):
 }"""        
         self.settings = TestSettings(settings_json)
 
-    def run_print(self, print_arg:str):
+    def test_print_SIPLP(self):
         with captured_output() as (out, err):
-            Main('fake_progname', ['-print', print_arg, '-mxver', '7']).main()
+            Main('fake_progname', ['-print', 'SIPLP', '-mxver', '7', '-hello', 'world'], self.settings).main()
 
         errout = err.getvalue()
         if not errout is None and len(errout) > 0:
@@ -52,41 +52,19 @@ class TestMain(unittest.TestCase):
 
         output = out.getvalue().strip()
         print(output)
+        self.assertTrue(output.find("-hello world") >= 0)
         self.assertTrue(output.find("\n Version") >= 0)            
         self.assertTrue(output.find("\n Trace ind: 1") >= 0)
         self.assertTrue(output.find(" Unit name: SIPLP") >= 0)
 
-    def test_main_start(self):
-        settings_json = """
-{
-    "trace_cmd": "python",
-    "trace_args": ["tests/trace_mockup_7x.py"],
-    "default_textlevel": "full",
-    "gangs": [
-        {
-            "name": "usual",
-            "members": ["SIPLP", "RMP", "CMP"]
-        },
-        {
-            "name": "csta",
-            "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
-        },
-        {
-            "name": "unusual",
-            "members": ["SIPLP", "MADEUP", "CMP"]
-        }
-    ],
-    "debug_trace_level": 7,
-    "debug_trace_commands": 6
-}"""        
-        settings = TestSettings(settings_json)
+    # def test_main_start(self):
+       
+    #     # test display
+    #     # main = Main('test_main', [ "-display"], settings)
+    #     # main.main()
 
-        # test display
-        # main = Main('test_main', [ "-display"], settings)
-        # main.main()
-
-        main = Main('test_main', [ "-start", "unusual"], settings)
-        main.main()
+    #     main = Main('test_main', [ "-display", "unusual", '-hello', 'world'], self.settings)
+    #     main.main()
 
 
     pass

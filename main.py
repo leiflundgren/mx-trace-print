@@ -55,7 +55,7 @@ class Main:
         display_args = self.command_line.display
         if not display_args is None:
             trace(3, "display " + " ".join(display_args), file=sys.stderr)
-            self.call_display(display_args)
+            self.call_display(display_args + self.command_line.display_extra_args().argv)
             print(self.parsed_display)
             return
 
@@ -63,7 +63,7 @@ class Main:
         if not add_args is None:
             trace(3, "add " + " ".join(add_args))
             self.call_display()
-            add_extra_args = self.command_line.add_extra_args()
+            add_extra_args = self.command_line.add_extra_args().argv
             self.call_add(add_args.split(','), self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel, add_extra_args)
             return
 
@@ -71,7 +71,7 @@ class Main:
         if not remove_args is None:
             trace(3, "remove " + " ".join(remove_args))
             self.call_display()
-            remove_extra_args = self.command_line.remove_extra_args()
+            remove_extra_args = self.command_line.remove_extra_args().argv
             self.call_remove(remove_args.split(','), remove_extra_args)
             return
 
@@ -80,7 +80,7 @@ class Main:
         if not start_args is None:
             trace(3, "start " + " ".join(start_args))
             self.call_display()
-            start_extra_args = self.command_line.start_extra_args()
+            start_extra_args = self.command_line.start_extra_args().argv
             self.call_start(start_args.split(','), self.command_line.lim, self.command_line.textlevel or self.settings.default_textlevel, start_extra_args)
             return
 
@@ -88,14 +88,15 @@ class Main:
         if not stop_args is None:
             trace(3, "stop " + " ".join(stop_args))
             self.call_display()
-            self.call_stop(stop_args.split(','), self.command_line.stop_extra_args())
+            self.call_stop(stop_args.split(','), self.command_line.stop_extra_args().argv)
             return
 
         print_args = self.command_line.print
         if not print_args is None:
-            trace(3, "print " + " ".join(print_args))
+            trace(3, "print " + print_args)
             self.call_display()
-            printout = self.call_print(print_args.split(','))
+            extra_args = self.command_line.print_extra_args().argv
+            printout = self.call_print([print_args], extra_args)
             print(printout)
             return printout
 
@@ -124,7 +125,7 @@ class Main:
         else:
             return self.settings.expand_to_individuals(ids_or_gangs)
 
-    def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':        
+    def call_display(self, args:[str] = []) -> 'ParseDisplayOutput':
         disp_output = self.execute(['-display'] + args).str_result
         self.set_parsed_display(ParseDisplayOutput(disp_output))
 

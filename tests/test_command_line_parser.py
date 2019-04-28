@@ -33,5 +33,16 @@ class TestCommendLineParser(unittest.TestCase):
         self.assertEqual(['arg', 'till', 'denna'], cmd.get_args('flera'))
         self.assertEqual('arg', cmd.get_arg('flera'))
 
+    def test_remove_arg(self):
+        argv = ['progname', '-hej', 'hopp', '-alone', '--bara', 'bra', '-flera', 'arg', 'till', 'denna']
+
+        r = CommandLineParser('prog', argv)
+        self.assertIn('-hej', r.argv)
+        self.assertIn('hopp', r.argv)
+
+        r_no_hej = r.remove_arg('hej')
+        self.assertNotIn('-hej', r_no_hej.argv)
+        self.assertNotIn('hopp', r_no_hej.argv)
+
 if __name__ == '__main__':
     unittest.main()

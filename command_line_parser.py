@@ -1,11 +1,15 @@
 
 class CommandLineParser:
-    def __init__(self, program_name:str, argv:[str] ):
-        self.program_name = program_name
-        self.original_args = argv
-        self.argv = argv
-   
-    
+    def __init__(self, *arg ):
+        if isinstance(arg, str):
+            self.program_name = arg
+        else:
+            self.program_name = arg[0]
+            if isinstance(arg[1], list):
+                self.original_args = arg[1]
+            else:
+                self.original_args = arg
+            self.argv = self.original_args
 
     def get_args(self, name:str, default_value:str = None) -> [str]:
         return CommandLineParser.get_argument(name, self.argv, default_value)
@@ -19,11 +23,13 @@ class CommandLineParser:
         return not arg_ls is None
 
     def replace_arg(self, name:str, val:[str]) -> 'CommandLineParser':
-        return CommandLineParser(self.program_name, CommandLineParser.replace_argument(name, self.argv, val))
+        return CommandLineParser(*CommandLineParser.replace_argument(name, self.argv, val))
 
     def remove_arg(self, *names:[str]) -> 'CommandLineParser':
+        cmd = self
         for n in names:
-            return self.replace_arg(n, None)
+            cmd = cmd.replace_arg(n, None)
+        return cmd
 
 
     @staticmethod
@@ -79,18 +85,12 @@ class CommandLineParser:
         if start < 0:
             return args
         
-        pre = args[:start-1] if start > 0 else []
-        post = args[stop+1:] if stop+1 < len(args) else []
+        pre = argv[:start] if start > 0 else []
+        post = argv[stop+1:] if stop+1 < len(argv) else []
         if val is None or len(val) == 0:
             return pre + post
         else:
             return pre + [val] + post
-
-
-
-    @property
-    def program_name(self) -> str:
-        return self.program_name
 
     def set_program_name(self, new_name) -> 'CommandLineParser':
         return CommandLineParser(new_name, self.argv)
@@ -120,8 +120,11 @@ class CommandLineParser:
     def display(self) -> [str]:
         """
             :return: the optional argument to display [0,1..15]
-        """
+        """    
         return self.get_args('display')
+
+    def display_extra_args(self) -> 'CommandLineParser':
+        return self.remove_arg('display')
 
     @property
     def lim(self) -> str:

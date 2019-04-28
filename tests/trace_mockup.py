@@ -11,7 +11,7 @@ from command_line_parser import CommandLineParser
 
 class TraceMockup:
     def __init__(self, argv:[str]):
-        print(argv)
+        print(" ".join(argv))
         self.args = CommandLineParser(argv[0], argv[1:])
         self.mxver = int(self.args.get_arg('mxver', '0'))
         if self.mxver == 6:
