@@ -42,13 +42,13 @@ class TestCommendGenerator(unittest.TestCase):
         self.trace("add(ISUS) cmd ", isus_cmd)
         self.assertTrue(isinstance(isus_cmd, list))
         self.assertEqual(1, len(isus_cmd))
-        self.assertEqual(isus_cmd[0], 'trace -lim 4 -unit ISUS')
+        self.assertEqual(' '.join(isus_cmd[0]), '-lim 4 -unit ISUS')
 
     def test_add_csta_gang(self):
         gang_cmd = self.cmdgen.add('csta')
-        self.assertIn('trace -lim 1 -unit ISUS', gang_cmd)
+        self.assertIn('-lim 1 -unit ISUS'.split(' '), gang_cmd)
         # self.assertIn('trace -lim 1 -unit CSTServer', gang_cmd)
-        self.assertNotIn('trace -lim 1 -unit SIPLP', gang_cmd)
+        self.assertNotIn(['-lim', '1', '-unit', 'SIPLP'], gang_cmd)
 
     def test_set_textlevel(self):
         set_cmd = self.cmdgen.set_textlevel('SIPLP', 'full')
@@ -57,7 +57,8 @@ class TestCommendGenerator(unittest.TestCase):
     def test_print_usual(self):
         self.trace(3, 'Printing buffers for usual gang: SIPLP, RMP, CMP')
         cmd = self.cmdgen.save_cmd(self.settings.expand_to_individuals(['usual']), 'sample_')
-        self.trace(3, "    " +  "\n    ".join( map(lambda t: ("(" + ",".join(t) + ")"), cmd) ) )
+        for args, fname in cmd:
+            self.trace(3, "    " + ", ".join(args) + "  filename:" + fname)
         self.assertEqual(3, len(cmd))
         self.assertEqual('sample_SIPLP.log', cmd[0][1])
 
