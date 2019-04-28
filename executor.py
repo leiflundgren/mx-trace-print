@@ -13,7 +13,7 @@ class Executor:
         prog_args = [self.program]
         if not args is None: prog_args += args
         
-        trace(trace_cmd_level, 'Executor ' + program, args)
+        trace(trace_cmd_level, 'Executor ' + program + ' ', args)
         try:
             self.result = subprocess.check_output(prog_args)
             if tracelevel >= trace_result_level:

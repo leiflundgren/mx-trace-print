@@ -161,6 +161,8 @@ class Main:
         
         existing_individuals = filter(lambda indv: not indv is None, individuals)        
         
+        # extra_args = self.command_line.get_non_save()
+
         for indv in existing_individuals:
             (print_cmd, filename) = self.command_generator.save_cmd([indv.unit_name], prefix, postfix)[0]        
             trace(3, 'printing ' + indv.id + "/" + indv.unit_name + " to " + filename)

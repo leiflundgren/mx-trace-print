@@ -1,4 +1,11 @@
+import os
+import sys
 import unittest
+
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
 from command_line_parser import CommandLineParser
 from settings import Settings
 import tools 

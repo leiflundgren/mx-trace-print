@@ -6,6 +6,10 @@ import os
 
 import tempfile
 
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
 from settings import Settings
 from parse_display import ParseDisplayOutput
 from main import Main
@@ -19,7 +23,7 @@ class TestSave(unittest.TestCase):
         settings_json = """
 {
     "trace_cmd": "python",
-    "trace_args": ["trace_mockup_7x.py"],
+    "trace_args": ["tests/trace_mockup_7x.py"],
     "default_textlevel": "full",
     "gangs": [
         {
