@@ -82,10 +82,11 @@ def trace(level:int, *args, file=sys.stdout):
     except UnicodeEncodeError:
         print(msg.encode('cp850', errors='replace'), file=handle)
 
+
 def pretty(value,htchar="\t",lfchar="\n",indent=0):
   if type(value) in [dict]:
-    return "{%s%s%s}"%(",".join(["%s%s%s: %s"%(lfchar,htchar*(indent+1),repr(key),pretty(value[key],htchar,lfchar,indent+1))for key in value]),lfchar,(htchar*indent))
+    return "{%s%s%s}"%(",".join(["%s%s%s: %s"%(lfchar,htchar*(indent+1),repr(key),pretty(value[key],htchar,lfchar,indent+1)) for key in value]),lfchar,(htchar*indent))
   elif type(value) in [list,tuple]:
-    return (type(value)is list and"[%s%s%s]"or"(%s%s%s)")%(",".join(["%s%s%s"%(lfchar,htchar*(indent+1),pretty(item,htchar,lfchar,indent+1))for item in value]),lfchar,(htchar*indent))
+    return (type(value)is list and "[%s%s%s]" or "(%s%s%s)")%(",".join(["%s%s%s"%(lfchar,htchar*(indent+1),pretty(item,htchar,lfchar,indent+1)) for item in value]),lfchar,(htchar*indent))
   else:
     return repr(value)
