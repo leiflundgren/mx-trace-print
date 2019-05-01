@@ -1,5 +1,4 @@
 import io
-from typing import List, Optional
 import tools
 
 class ParseDisplayOutput:
@@ -105,7 +104,7 @@ class ParseDisplayOutput:
         return  "\n".join( [str(i) for i in self.individuals ] )
 
     @property
-    def is_valid() -> bool:
+    def is_valid(self) -> bool:
         return not self.individuals is None
 
     @property

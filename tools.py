@@ -14,8 +14,8 @@ def read(file_thing) -> [str]:
                 return f.readlines()
     raise ValueError("Cannot read data from " + str(type(file_thing)))
 
-def open_read_file(name) -> io.TextIOBase:
-    return open(name, "r", encoding='iso-8859-1')
+def open_read_file(name, mode:str="r", encoding='iso-8859-1') -> io.TextIOBase:
+    return open(name, mode, encoding=encoding)
 
 
 tracelevel = 4

@@ -3,7 +3,9 @@
 import sys
 import io
 import os
+import json
 import zipfile
+
 
 from command_line_parser import CommandLineParser
 from command_generator import CommandGenerator
@@ -45,8 +47,12 @@ Switches not used by this program should be passed down to trace
     def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
         self.command_line = CommandLineParser(program_name, argv)
         self.settings = settings or Main.find_settings(self.command_line.settings_file)
-        self.parsed_display = ParseDisplayOutput("")
-        self.command_generator = CommandGenerator(self.parsed_display, self.settings)
+        # No type hints on variables, as py3to2 doesn't handle them
+        #self.parsed_display = ParseDisplayOutput(io.StringIO(''))
+        self.parsed_display = None
+        self.command_generator = None
+        # self.command_generator: 'CommandGenerator' = None
+        # self.command_generator = CommandGenerator(self.parsed_display, self.settings)
 
     def set_parsed_display(self, val:ParseDisplayOutput):
         self.parsed_display = val
@@ -65,14 +71,14 @@ Switches not used by this program should be passed down to trace
     @staticmethod 
     def find_settings(file:str = None) -> str:
         ex = None
-        files = [
+        files = filter(None, [
             file,            
             os.path.join( os.path.dirname(os.path.realpath(__file__)), 'settings.json'),
             os.path.join( os.path.expanduser("~"), '.mx-trace', 'settings.json'),
             os.path.join( os.path.expanduser("~"), '.mx-trace.json')
-        ] 
+        ])
         for f in files:
-            if not f is None and os.path.exists(f):
+            if os.path.exists(f):
                 try:
                     return Settings(f)
                 except BaseException as ex:
@@ -216,8 +222,9 @@ Switches not used by this program should be passed down to trace
 
 
     def call_display_settings(self) -> str:
-        print(self.settings.raw_data)
-        return self.settings.raw_data
+        j = json.dumps(self.settings.data, sort_keys=True, indent=4)
+        print(j)
+        return j
 
     def call_help(self) -> str:
         print(Main.help_str)

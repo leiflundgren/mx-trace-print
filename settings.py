@@ -13,12 +13,45 @@ class Settings:
         elif isinstance(settings_file, str) and (settings_file.count('\n') > 1 or not os.path.exists(settings_file) ):
             self.raw_data = settings_file
             trimmed = Settings.trim_json_comments(settings_file)
-            self.data = json.load(io.StringIO(trimmed))
+            self._set_data_object(json.load(io.StringIO(trimmed)))
             tools.tracelevel = self.debug_trace_level
         elif isinstance(settings_file, str):
             with tools.open_read_file(settings_file) as f:
                 self.__init__(f.read())
                 return
+
+    def _set_data_object(self, data_dict):
+        self.data = data_dict
+        self.add_default('default_textlevel', 'default')  # none means "default"
+        self.add_default('trace_cmd', 'trace')
+        self.add_default('trace_args', [])
+        self.add_default('file_prefix', 'trace_mx_')
+        self.add_default('file_postfix', '.log')
+        self.add_default('file_separators', '-_/=')
+        self.add_default('zip_prefix', self.file_prefix)
+        self.add_default('file_postfix', self.file_postfix)
+        self.add_default('debug_trace_level', 7)
+        self.add_default('debug_trace_commands', 7)
+        self.add_default('debug_trace_output', 7)
+        if not 'gangs' in self.data:
+            self.data['gangs'] = [
+                {
+                    "name": "usual",
+                    "members": ["SIPLP", "RMP", "CMP"]
+                },
+                {
+                    "name": "csta",
+                    "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
+                },
+                {
+                    "name": "unusual",
+                    "members": ["SIPLP", "MADEUP", "CMP"]
+                }
+            ],
+
+    def add_default(self, setting:str, value):
+        if setting not in self.data:
+            self.data[setting] = value
 
     @staticmethod
     def trim_json_comments(data_string):

@@ -53,7 +53,50 @@
                 "--no-diffs",
                 "--write",
                 "--nobackups",
-                "artefacts/mx-trace-helper2.py" 
+                "artefacts/mx-trace-helper2.py"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            }
+        },
+        {
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "label": "prepare folder py 3to2",
+            "type": "shell",
+            "command": "cp",
+            "args": [
+                "-v",
+                "*.py",
+                "artefacts/py2"
+            ]
+        },
+        {
+            "dependsOn": "prepare folder py 3to2",
+            "label": "py3to2",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python36_64/Scripts/3to2.py",
+                "--no-diffs",
+                "--write",
+                "--nobackups",
+                "artefacts/py2/*py"
             ],
             "group": {
                 "kind": "build",
@@ -67,6 +110,7 @@
                 "showReuseMessage": false,
                 "clear": false
             },
+            "problemMatcher": []
         }
     ]
 }
