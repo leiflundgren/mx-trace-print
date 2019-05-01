@@ -194,7 +194,7 @@ def _command_line_parser(__name__):
             return self.remove_arg('stop').remove_arg('lim')
     
         @property
-        def print(self) -> str:
+        def print_args(self) -> str:
             return self.get_arg('print')
         def print_extra_args(self) -> 'CommandLineParser' :
             return self.remove_arg('print').remove_arg('lim')
@@ -436,8 +436,8 @@ def _parse_display(__name__):
             if isinstance(self.source, str):
                 self.source = self.source.splitlines()
     
-            self.individuals : List[ParseDisplayOutput.Individual] = [] 
-            parts : List[str] = []
+            parts = [] #List[str] 
+            self.individuals  = [] # List['ParseDisplayOutput.Individual'] 
     
             in_header = True
             for line in self.source:
@@ -637,7 +637,7 @@ def _command_generator(__name__):
     
     class CommandGenerator:
     
-        def __init__(self, display_output:ParseDisplayOutput, settings:'Settings'):
+        def __init__(self, display_output:'ParseDisplayOutput', settings:'Settings'):
             self.display_output = display_output
             self.mx_version = self.display_output.version
             self.settings = settings
@@ -841,6 +841,8 @@ def _executor(__name__):
 @modulize('main')
 def _main(__name__):
     ##----- Begin main.py --------------------------------------------------------##
+    #!/usr/bin/python
+    
     import sys
     import io
     import os
@@ -886,8 +888,8 @@ def _main(__name__):
         def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
             self.command_line = CommandLineParser(program_name, argv)
             self.settings = settings or Main.find_settings(self.command_line.settings_file)
-            self.parsed_display : ParseDisplayOutput = None
-            self.command_generator : CommandGenerator = None
+            self.parsed_display = 'ParseDisplayOutput' = None # ("")
+            self.command_generator = CommandGenerator(self.parsed_display, self.settings)
     
         def set_parsed_display(self, val:ParseDisplayOutput):
             self.parsed_display = val
@@ -975,7 +977,7 @@ def _main(__name__):
                 self.call_stop(stop_args.split(','), self.command_line.stop_extra_args().argv)
                 return
     
-            print_args = self.command_line.print
+            print_args = self.command_line.print_args
             if not print_args is None:
                 trace(3, "print " + print_args)
                 self.call_display()

@@ -165,7 +165,7 @@ class CommandLineParser:
         return self.remove_arg('stop').remove_arg('lim')
 
     @property
-    def print(self) -> str:
+    def print_args(self) -> str:
         return self.get_arg('print')
     def print_extra_args(self) -> 'CommandLineParser' :
         return self.remove_arg('print').remove_arg('lim')

@@ -5,7 +5,7 @@ import sys
 
 class CommandGenerator:
 
-    def __init__(self, display_output:ParseDisplayOutput, settings:'Settings'):
+    def __init__(self, display_output:'ParseDisplayOutput', settings:'Settings'):
         self.display_output = display_output
         self.mx_version = self.display_output.version
         self.settings = settings

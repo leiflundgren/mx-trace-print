@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import io
 import os
@@ -43,8 +45,8 @@ Switches not used by this program should be passed down to trace
     def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
         self.command_line = CommandLineParser(program_name, argv)
         self.settings = settings or Main.find_settings(self.command_line.settings_file)
-        self.parsed_display : ParseDisplayOutput = None
-        self.command_generator : CommandGenerator = None
+        self.parsed_display = ParseDisplayOutput("")
+        self.command_generator = CommandGenerator(self.parsed_display, self.settings)
 
     def set_parsed_display(self, val:ParseDisplayOutput):
         self.parsed_display = val
@@ -132,7 +134,7 @@ Switches not used by this program should be passed down to trace
             self.call_stop(stop_args.split(','), self.command_line.stop_extra_args().argv)
             return
 
-        print_args = self.command_line.print
+        print_args = self.command_line.print_args
         if not print_args is None:
             trace(3, "print " + print_args)
             self.call_display()

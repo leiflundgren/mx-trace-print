@@ -66,8 +66,8 @@ class ParseDisplayOutput:
         if isinstance(self.source, str):
             self.source = self.source.splitlines()
 
-        self.individuals : List[ParseDisplayOutput.Individual] = [] 
-        parts : List[str] = []
+        parts = [] #List[str] 
+        self.individuals  = [] # List['ParseDisplayOutput.Individual'] 
 
         in_header = True
         for line in self.source:
@@ -103,6 +103,10 @@ class ParseDisplayOutput:
 
     def __str__(self) -> str:
         return  "\n".join( [str(i) for i in self.individuals ] )
+
+    @property
+    def is_valid() -> bool:
+        return not self.individuals is None
 
     @property
     def first_trace(self) -> str:

@@ -199,7 +199,7 @@ def _command_line_parser(__name__):
             return self.remove_arg(u'stop').remove_arg(u'lim')
     
         @property
-        def print(self):
+        def print_args(self):
             return self.get_arg(u'print')
         def print_extra_args(self) :
             return self.remove_arg(u'print').remove_arg(u'lim')
@@ -443,8 +443,8 @@ def _parse_display(__name__):
             if isinstance(self.source, unicode):
                 self.source = self.source.splitlines()
     
-            self.individuals : List[ParseDisplayOutput.Individual] = [] 
-            parts : List[unicode] = []
+            parts = [] #List[str] 
+            self.individuals  = [] # List['ParseDisplayOutput.Individual'] 
     
             in_header = True
             for line in self.source:
@@ -848,6 +848,8 @@ def _executor(__name__):
 @modulize(u'main')
 def _main(__name__):
     ##----- Begin main.py --------------------------------------------------------##
+    #!/usr/bin/python
+    
     import sys
     import io
     import os
@@ -893,8 +895,8 @@ def _main(__name__):
         def __init__(self, program_name, argv, settings = None):
             self.command_line = CommandLineParser(program_name, argv)
             self.settings = settings or Main.find_settings(self.command_line.settings_file)
-            self.parsed_display : ParseDisplayOutput = None
-            self.command_generator : CommandGenerator = None
+            self.parsed_display = u'ParseDisplayOutput' = None # ("")
+            self.command_generator = CommandGenerator(self.parsed_display, self.settings)
     
         def set_parsed_display(self, val):
             self.parsed_display = val
@@ -982,7 +984,7 @@ def _main(__name__):
                 self.call_stop(stop_args.split(u','), self.command_line.stop_extra_args().argv)
                 return
     
-            print_args = self.command_line.print
+            print_args = self.command_line.print_args
             if not print_args is None:
                 trace(3, u"print " + print_args)
                 self.call_display()
