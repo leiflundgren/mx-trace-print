@@ -1,20 +1,11 @@
 {
     "trace_cmd": "trace",
     "default_textlevel": "full",
-    "gangs": [
-        {
-            "name": "usual",
-            "members": ["SIPLP", "RMP", "CMP"]
-        },
-        {
-            "name": "csta",
-            "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
-        },
-        {
-            "name": "unusual",
-            "members": ["SIPLP", "MADEUP", "CMP"]
-        }
-    ],
+    "gangs": {
+        "usual": ["SIPLP", "RMP", "CMP"],
+        "csta": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"],
+        "unusual": ["SIPLP", "MADEUP", "CMP"]        
+    },
     "save_prefix": "trace_mx_",
     "save_postfix": ".log",
     "file_separators": "-_/=",

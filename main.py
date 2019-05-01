@@ -44,8 +44,8 @@ Switches not used by this program should be passed down to trace
 
 """    
 
-    def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
-        self.command_line = CommandLineParser(program_name, argv)
+    def __init__(self, argv:[str], settings:'Settings' = None) -> None:
+        self.command_line = CommandLineParser(argv)
         self.settings = settings or Main.find_settings(self.command_line.settings_file)
         # No type hints on variables, as py3to2 doesn't handle them
         #self.parsed_display = ParseDisplayOutput(io.StringIO(''))
@@ -59,13 +59,15 @@ Switches not used by this program should be passed down to trace
         self.command_generator = CommandGenerator(val, self.settings)
 
     def execute(self, args:[str]) -> 'Executor':        
+        if not isinstance(args, list): 
+            raise ValueError('Arguments should be list, not: ' + str(args))
         return Executor(self.settings.trace_cmd, self.settings.trace_args + args, trace_cmd_level=self.settings.debug_trace_commands)
 
-    def execute_all(self, list_of_args:[[str]]) -> str:
+    def execute_all(self, list_of_args:[[str]], extra_args:[str]=[]) -> str:
         if not isinstance(list_of_args, list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
         if not isinstance(list_of_args[0], list): raise ValueError("args should be list of command-line-lists, was just " + str(type(list_of_args)))
 
-        return "\n".join([self.execute(arg).str_result for arg in list_of_args])
+        return "\n".join([self.execute(arg + extra_args).str_result for arg in list_of_args])
 
 
     @staticmethod 
@@ -177,7 +179,7 @@ Switches not used by this program should be passed down to trace
         self.call_unknown_command()
         return
 
-    def expand_to_ids(self, ids_or_gangs:[str]) -> str:
+    def expand_to_ids(self, ids_or_gangs:[str]) -> [str]:
         if isinstance(ids_or_gangs, str): # Handle if list forgotten
             ids_or_gangs = [ids_or_gangs]
         list_of_lists = [ iog.split(',') for iog in ids_or_gangs]
@@ -285,7 +287,7 @@ Switches not used by this program should be passed down to trace
         individuals = self.expand_to_ids(args)
         existing = filter(lambda id: not self.parsed_display.get_individual(id) is None, individuals)        
         print_cmds = self.command_generator.print_cmd(existing)
-        return self.execute_all(print_cmds + extra_args)
+        return self.execute_all(print_cmds, extra_args)
     
     def call_save(self, args:[str], prefix, postfix, extra_args:[str] = []) -> str:
         if self.parsed_display is None:
@@ -357,4 +359,4 @@ Switches not used by this program should be passed down to trace
             self.execute(a)
 
 if __name__ == "__main__":
-    Main(sys.argv[0], sys.argv[1:]).main()
+    Main(sys.argv).main()

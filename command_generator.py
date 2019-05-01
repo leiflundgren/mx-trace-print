@@ -87,7 +87,7 @@ class CommandGenerator:
 
     def add_indv(self, name:[str], lim:str = "1", extra_args:[str] = []) -> [str]:
         res = []
-        for member in self.settings.expand_to_individuals(name):
+        for member in self.settings.expand_to_ids(name):
             if self.display_output.get_individual(member) is None:               
                 res.append(CommandGenerator.get_cmd_add_individual(member, lim) + extra_args)
 
@@ -95,7 +95,7 @@ class CommandGenerator:
 
     def remove(self, name:[str]) -> [str]:
         res = []
-        for member in self.settings.expand_to_individuals(name):
+        for member in self.settings.expand_to_ids(name):
             if self.display_output.get_individual(member) is None:               
                 res.append(CommandGenerator.get_cmd_remove_individual(member))
 
@@ -104,7 +104,7 @@ class CommandGenerator:
     def set_textlevel(self, name:[str], textlevel:str = 'normal') -> [str]:
         res = []
         
-        for member in self.settings.expand_to_individuals(name):
+        for member in self.settings.expand_to_ids(name):
             indv = self.display_output.get_individual(member)
             if indv is None:
                 trace(2, "Unknown gang-member '" + member + "' Textlevel not changed")

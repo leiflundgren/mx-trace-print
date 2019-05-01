@@ -12,7 +12,7 @@ from command_line_parser import CommandLineParser
 class TraceMockup:
     def __init__(self, argv:[str]):
         print(" ".join(argv))
-        self.args = CommandLineParser(argv[0], argv[1:])
+        self.args = CommandLineParser(argv)
         self.mxver = int(self.args.get_arg('mxver', '0'))
         if self.mxver == 6:
             self.help_file = 'trace-help.output'
@@ -26,7 +26,7 @@ class TraceMockup:
             raise ValueError("Unknown MX-One version " + str(self.mxver))
 
         display_args = self.args.display
-        print_args = self.args.print
+        print_args = self.args.print_args
 
         if self.args.help:
             self.print_help()

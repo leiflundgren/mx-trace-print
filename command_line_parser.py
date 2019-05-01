@@ -1,15 +1,9 @@
 
 class CommandLineParser:
-    def __init__(self, *arg ):
-        if isinstance(arg, str):
-            self.program_name = arg
-        else:
-            self.program_name = arg[0]
-            if isinstance(arg[1], list):
-                self.original_args = arg[1]
-            else:
-                self.original_args = arg
-            self.argv = self.original_args
+    def __init__(self, arg:[str] ):
+        self.program_name = arg[0]
+        self.original_args = arg
+        self.argv = arg[1:]
 
     def get_args(self, name:str, default_value:str = None) -> [str]:
         return CommandLineParser.get_argument(name, self.argv, default_value)
@@ -23,7 +17,8 @@ class CommandLineParser:
         return not arg_ls is None
 
     def replace_arg(self, name:str, val:[str]) -> 'CommandLineParser':
-        return CommandLineParser(*CommandLineParser.replace_argument(name, self.argv, val))
+        argv = CommandLineParser.replace_argument(name, self.argv, val)
+        return CommandLineParser([self.program_name] + argv)
 
     def remove_arg(self, *names:[str]) -> 'CommandLineParser':
         cmd = self
@@ -81,9 +76,9 @@ class CommandLineParser:
                 None to remove the switch all together
             :returns: the updated arguments
         """
-        (start,stop, args) = CommandLineParser.find_arg_index(name, argv)
+        (start,stop, _args) = CommandLineParser.find_arg_index(name, argv)
         if start < 0:
-            return args
+            return argv
         
         pre = argv[:start] if start > 0 else []
         post = argv[stop+1:] if stop+1 < len(argv) else []
@@ -93,8 +88,8 @@ class CommandLineParser:
             return pre + [val] + post
 
     def set_program_name(self, new_name) -> 'CommandLineParser':
-        return CommandLineParser(new_name, self.argv)
-
+        return CommandLineParser([new_name] + self.argv[1:])
+  
     @property
     def is_empty(self) -> bool:
         """ Considered empty is only program-name """
@@ -168,7 +163,7 @@ class CommandLineParser:
     def print_args(self) -> str:
         return self.get_arg('print')
     def print_extra_args(self) -> 'CommandLineParser' :
-        return self.remove_arg('print').remove_arg('lim')
+        return self.remove_arg('print', 'lim')
 
     @property
     def save(self) -> str:

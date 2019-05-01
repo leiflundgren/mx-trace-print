@@ -25,20 +25,11 @@ class TestZip(unittest.TestCase):
     "trace_cmd": "python",
     "trace_args": ["tests/trace_mockup_7x.py"],
     "default_textlevel": "full",
-    "gangs": [
-        {
-            "name": "usual",
-            "members": ["SIPLP", "RMP", "CMP"]
-        },
-        {
-            "name": "csta",
-            "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
-        },
-        {
-            "name": "unusual",
-            "members": ["SIPLP", "MADEUP", "CMP"]
-        }
-    ],
+    "gangs": {
+        "usual": ["SIPLP", "RMP", "CMP"],
+        "csta": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"],
+        "unusual": ["SIPLP", "MADEUP", "CMP"]        
+    },
     "debug_trace_level": 7,
     "debug_trace_commands": 6
 }"""        
@@ -51,7 +42,7 @@ class TestZip(unittest.TestCase):
         trace(5, 'Creating ', folder)
         os.mkdir(folder)
 
-        m = Main('fake_progname', ['-zip', os.path.join(folder, "zipped"), save_arg, '-mxver', '7', '-prefix', 'trace_prefix'], settings=self.settings)
+        m = Main(['fake_progname', '-zip', os.path.join(folder, "zipped"), save_arg, '-mxver', '7', '-prefix', 'trace_prefix'], settings=self.settings)
         m.main()
         
         files = os.listdir(folder)

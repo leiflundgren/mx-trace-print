@@ -24,7 +24,7 @@ class TestCommendGenerator(unittest.TestCase):
         self.trace(4, 'setup done')
 
 
-        print(self.cmdgen.add('csta'))
+        print(self.cmdgen.add_indv('csta'))
 
     def test_expand(self):
         self.assertListEqual(['1','2','3'], self.cmdgen.expand_names('1,2,3'))
@@ -38,14 +38,14 @@ class TestCommendGenerator(unittest.TestCase):
         isus =  self.display.get_individual('ISUS')
         self.assertIsNone(isus)
 
-        isus_cmd = self.cmdgen.add('ISUS', '4')
+        isus_cmd = self.cmdgen.add_indv('ISUS', '4')
         self.trace("add(ISUS) cmd ", isus_cmd)
         self.assertTrue(isinstance(isus_cmd, list))
         self.assertEqual(1, len(isus_cmd))
         self.assertEqual(' '.join(isus_cmd[0]), '-lim 4 -unit ISUS')
 
     def test_add_csta_gang(self):
-        gang_cmd = self.cmdgen.add('csta')
+        gang_cmd = self.cmdgen.add_indv('csta')
         self.assertIn('-lim 1 -unit ISUS'.split(' '), gang_cmd)
         # self.assertIn('trace -lim 1 -unit CSTServer', gang_cmd)
         self.assertNotIn(['-lim', '1', '-unit', 'SIPLP'], gang_cmd)
@@ -56,7 +56,7 @@ class TestCommendGenerator(unittest.TestCase):
 
     def test_print_usual(self):
         self.trace(3, 'Printing buffers for usual gang: SIPLP, RMP, CMP')
-        cmd = self.cmdgen.save_cmd(self.settings.expand_to_individuals(['usual']), 'sample_')
+        cmd = self.cmdgen.save_cmd(self.settings.expand_to_ids(['usual']), 'sample_')
         for args, fname in cmd:
             self.trace(3, "    " + ", ".join(args) + "  filename:" + fname)
         self.assertEqual(3, len(cmd))

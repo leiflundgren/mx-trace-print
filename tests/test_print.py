@@ -20,20 +20,11 @@ class TestPrint(unittest.TestCase):
     "trace_cmd": "python",
     "trace_args": ["tests/trace_mockup_7x.py"],
     "default_textlevel": "full",
-    "gangs": [
-        {
-            "name": "usual",
-            "members": ["SIPLP", "RMP", "CMP"]
-        },
-        {
-            "name": "csta",
-            "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
-        },
-        {
-            "name": "unusual",
-            "members": ["SIPLP", "MADEUP", "CMP"]
-        }
-    ],
+    "gangs": {
+        "usual": ["SIPLP", "RMP", "CMP"],
+        "csta": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"],
+        "unusual": ["SIPLP", "MADEUP", "CMP"]        
+    },
     "debug_trace_level": 7,
     "debug_trace_commands": 6
 }"""        
@@ -44,7 +35,7 @@ class TestPrint(unittest.TestCase):
         printout = ''
         try:
             with captured_output() as (out, err):
-               printout = Main('fake_progname', ['-print', print_arg, '-mxver', '7'], settings=self.settings).main()
+               printout = Main(['fake_progname', '-print', print_arg, '-mxver', '7'], settings=self.settings).main()
         except:
             print(out.getvalue(), file=sys.stderr)
             print(err.getvalue(), file=sys.stderr)

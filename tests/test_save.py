@@ -25,20 +25,11 @@ class TestSave(unittest.TestCase):
     "trace_cmd": "python",
     "trace_args": ["tests/trace_mockup_7x.py"],
     "default_textlevel": "full",
-    "gangs": [
-        {
-            "name": "usual",
-            "members": ["SIPLP", "RMP", "CMP"]
-        },
-        {
-            "name": "csta",
-            "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
-        },
-        {
-            "name": "unusual",
-            "members": ["SIPLP", "MADEUP", "CMP"]
-        }
-    ],
+    "gangs": {
+        "usual": ["SIPLP", "RMP", "CMP"],
+        "csta": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"],
+        "unusual": ["SIPLP", "MADEUP", "CMP"]        
+    },
     "debug_trace_level": 7,
     "debug_trace_commands": 6
 }"""        
@@ -53,7 +44,7 @@ class TestSave(unittest.TestCase):
 
         prefix = os.path.join(folder, 'test_trace')
 
-        Main('fake_progname', ['-save', save_arg, '-mxver', '7', '-prefix', prefix], settings=self.settings).main()
+        Main(['fake_progname', '-save', save_arg, '-mxver', '7', '-prefix', prefix], settings=self.settings).main()
         
         files = os.listdir(folder)
         trace(3, 'Test ' + self._testMethodName + " yielded " + str(len(files)), " files:", files)

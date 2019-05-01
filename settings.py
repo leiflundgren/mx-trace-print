@@ -34,20 +34,10 @@ class Settings:
         self.add_default('debug_trace_commands', 7)
         self.add_default('debug_trace_output', 7)
         if not 'gangs' in self.data:
-            self.data['gangs'] = [
-                {
-                    "name": "usual",
-                    "members": ["SIPLP", "RMP", "CMP"]
-                },
-                {
-                    "name": "csta",
-                    "members": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
-                },
-                {
-                    "name": "unusual",
-                    "members": ["SIPLP", "MADEUP", "CMP"]
-                }
-            ],
+            self.data['gangs'] = {
+                "usual": ["SIPLP", "RMP", "CMP"],
+                "csta": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"]
+            }
 
     def add_default(self, setting:str, value):
         if setting not in self.data:
@@ -66,15 +56,11 @@ class Settings:
         return "\n".join(result)
 
     @property
-    def gangs(self) -> [{}]:
+    def gangs(self) -> {}:
         return self.data['gangs']
 
     def get_gang(self, name) -> [str]:
-        gangs_list = self.gangs
-        for g in gangs_list:
-            if g['name'] == name:
-                return g['members']
-        return None
+        return self.gangs.get(name, None)
 
     def expand_to_ids(self, ids_or_gangs:[str]) -> str:
         res = []
