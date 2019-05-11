@@ -28,7 +28,7 @@ class TestCommendLineParser(unittest.TestCase):
         r = CommandLineParser.find_arg_index('flera', argv)
         self.assertEqual((6, 9, ['arg', 'till', 'denna']), r)
 
-        cmd = CommandLineParser(argv[0], argv[1:])
+        cmd = CommandLineParser(argv)
         self.assertEqual('hopp', cmd.get_arg('hej'))
         self.assertEqual(['arg', 'till', 'denna'], cmd.get_args('flera'))
         self.assertEqual('arg', cmd.get_arg('flera'))
@@ -36,7 +36,7 @@ class TestCommendLineParser(unittest.TestCase):
     def test_remove_arg(self):
         argv = ['progname', '-hej', 'hopp', '-alone', '--bara', 'bra', '-flera', 'arg', 'till', 'denna']
 
-        r = CommandLineParser('prog', argv)
+        r = CommandLineParser(argv)
         self.assertIn('-hej', r.argv)
         self.assertIn('hopp', r.argv)
 

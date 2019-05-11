@@ -192,7 +192,7 @@ Switches not used by this program should be passed down to trace
             return self.settings.expand_to_ids(ids_or_gangs)
 
     def get_existing_ids(self, id_names:[str]) -> [str]:
-        return map( lambda indv: indv.id, self.get_existing_indivuduals(id_names))
+        return [ indv.id for indv in self.get_existing_indivuduals(id_names) ]
         # if len(id_names) == 0 or id_names[0].lower() == 'all':
         #     id_names = [str(indv) for indv in self.parsed_display.individuals]
         # else:
@@ -294,18 +294,16 @@ Switches not used by this program should be passed down to trace
         if self.parsed_display is None:
             raise ValueError("Called print when no display parser yet!")
         individuals_names = self.expand_to_ids(args)
-        individuals = map(lambda id: self.parsed_display.get_individual(id), individuals_names)
-        
-        existing_individuals = self.get_existing_ids(individuals)
+        existing_individuals = [self.parsed_display.get_individual(id) for id in individuals_names ]
         
         # extra_args = self.command_line.get_non_save()
 
         for indv in existing_individuals:
             (print_cmd, filename) = self.command_generator.save_cmd([indv.unit_name], prefix, postfix)[0]        
             trace(3, 'printing ' + indv.id + "/" + indv.unit_name + " to " + filename)
-            ex = self.execute(print_cmd)
+            ex = self.execute(print_cmd + extra_args)
             with io.open(filename, "w", encoding="latin-1") as fil:
-                fil.write(ex.str_result + extra_args)
+                fil.write(ex.str_result)
             
     def call_zip(self, args:[str], zipfilename, prefix, postfix, extra_args:[str] = []) -> str:
         if not isinstance(args, list): 
