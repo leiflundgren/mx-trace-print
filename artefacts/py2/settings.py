@@ -12,11 +12,16 @@ class Settings(object):
         if isinstance(settings_file, io.TextIOBase):
             self.__init__(settings_file.read())
             return
-        elif isinstance(settings_file, unicode) and (settings_file.count(u'\n') > 1 or not os.path.exists(settings_file) ):
+        elif isinstance(settings_file, unicode) and (settings_file.count(u'\n') > 1 and not os.path.exists(settings_file) ):
             self.raw_data = settings_file
+            # print 'raw settings'
+            # print settings_file
             trimmed = Settings.trim_json_comments(settings_file)
+            # print 'trimmed'
+            # print trimmed
             self._set_data_object(json.load(io.StringIO(trimmed)))
             tools.tracelevel = self.debug_trace_level
+            print u'loaded settings'
         elif isinstance(settings_file, unicode):
             with tools.open_read_file(settings_file) as f:
                 self.__init__(f.read())

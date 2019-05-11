@@ -1,0 +1,50 @@
+ Version: 6.3.3.0.33, 16.3.3.0.33, Market: (1) standard
+ Trace ind:  1, State: stopped     , Stored:   1618, Size per lim: 10000
+ First: 2019-03-19 16:45:50 (CET) Last: 2019-03-19 16:46:07 (CET)
+ Type     : unit-trace      , Rotating: on , Textlevel: all
+ Lim no   :   1, Unit no: 0298, Unit name: SIPLP
+ Time mark: 2019-03-19 16:46:09 (CET), by user: mxone_admin
+ Trace stopped by : command (manually stopped)
+
+--Diagnose :   1, 2019-03-19 16:45:50.497257 (CET)
+  From 0x012a=298   SIPLP                LIM 0x01=1
+src/SIPLP_CongestionManager.cxx:27
+SIPLP_CongestionManager::getRejectionBehavior: TransactionController::mStateMacFifo: fifo size 0
+
+
+--Basic    :   2, 2019-03-19 16:45:50.497561 (CET)
+  From 0x012a=298   SIPLP                LIM 0x01=1
+/local/home/jenkins/workspace/mx-release/md110_components/sipStack/resiprocate/code/resip/stack/Transport.cxx:402
+incoming from: [ V4 10.105.64.105:5060 UDP flowKey=26 transportKey=1 ]
+INVITE sip:55551@10.105.72.62:5060;user=phone SIP/2.0
+Via: SIP/2.0/UDP 10.105.64.105;branch=z9hG4bKc51f11248eb93e066.9358d00887581ad39
+Max-Forwards: 70
+Contact: "55553" <sip:55553@10.105.64.105:5060;transport=udp>;+sip.instance="<urn:uuid:00000000-0000-1000-8000-00085D4127F6>"
+To: <sip:55551@10.105.72.62:5060;user=phone>
+From: "55553" <sip:55553@10.105.72.62:5060>;tag=21e0b9eb20
+Call-ID: 1c221cab6d605265
+CSeq: 1923430917 INVITE
+Accept-Language: en
+Allow: INVITE, ACK, CANCEL, BYE, NOTIFY, REFER, OPTIONS, UPDATE, PRACK, SUBSCRIBE, INFO, PUBLISH
+Content-Type: application/sdp
+Supported: path, gruu, 100rel, replaces
+User-Agent: Aastra 6863i/5.1.0.190
+Allow-Events: talk, hold, conference, LocalModeStatus
+Content-Length: 589
+
+v=0
+o=MxSIP 0 1 IN IP4 10.105.64.105
+s=SIP Call
+c=IN IP4 10.105.64.105
+t=0 0
+m=audio 3000 RTP/AVP 0 18 113 112 98 97 115 96 9 8 117 118 119 101
+a=rtpmap:0 PCMU/8000
+a=rtpmap:18 G729/8000
+a=rtpmap:113 L16/16000
+a=rtpmap:112 L16/8000
+a=rtpmap:98 G726-16/8000
+a=rtpmap:97 G726-24/8000
+a=rtpmap:115 G726-32/8000
+a=rtpmap:96 G726-40/8000
+a=rtpmap:9 G722/8000
+a=rtpmap:8 PCMA/8000

@@ -1,0 +1,184 @@
+
+mxone_admin@LEIF1:~> trace -help
+
+NAME
+     trace - Handles trace functions
+
+SYNOPSIS
+     trace -lim N -unit NAME|
+     trace -lim N -unit NAME -signo S [-byte x-X,y-Y..z-Z]|
+     trace -lim N -unit NAME -signam NAME [-byte x-X,y-Y..z-Z]|
+     trace -dir DIRNO |
+     trace -equ x-y-zz-a |
+     trace -bpos x-y-zz [-mask aaaa] |
+     trace -mgw x [-mask aaaa] |
+     trace -modify T -rotate on/off |
+     trace -modify T {-sortin {off|1,2..20}|-sortout {off|1,2..20}}|
+     trace -modify T -info "txt"|
+     trace -modify T -size S |
+     trace -modify T -fcode N [-flim X -funit Y [-fsig Z]]|
+     trace -modify T {-ssigno N|-ssignam NAM } -sunit Y|
+     trace -modify T -sendalarm A|
+     trace -modify T -textlevel N|
+     trace -start 1,2..15 |
+     trace -stop 1,2..15  |
+     trace -print T [-lim N] [-signo S] [-show T] [-from X] [-to Y]
+           [-fromtime time] [-totime time] [-nodecode]|
+     trace -attach T -lim N [-signo S] [-show T][-nodecode]|
+     trace -clear 0,1..15 |
+     trace -display [0,1..15] [-lim N]|
+     trace -remove T
+
+PARAMETERS
+     -attach         The stated tri is printed in "real" time.
+                     Attach of 0 is printing the history log.
+                     Attach is done on a started trace.
+     -bpos           The hardware signalling position to trace on.
+                     Position entered as mgw-mag-32 group of equ
+                     HW signalling to and from boards.
+     -byte           Data in signal requires byte x with value X to
+                     start sequence.
+                     Five possible values can be stated.
+
+     -clear          The stored messages in the stated tri(s) are
+                     removed. "all" removes tri 1 to 15
+     -dir            Directory number of a subscriber where a signal
+                     sequence trace is started.
+     -display        Print trace setup for the stated tri.
+     -equ            Equipment position of a device where a signal
+                     sequence trace is started. mgw-mag-bpos-ind
+     -fcode          Stop on the trace if this type of fault is found
+                     in a lost signal. Values: 0-45 and "all" and
+                     "off".
+     -flim           The lim where a lost signal is received to stop
+                     a trace. Integer or all
+     -from           Sequence number in trace from where the print
+                     will start.
+     -fromtime       Date and time from where the print will start.
+     -fsig           Stop on the trace if this signal is lost in the
+                     stated lim and unit Values: 1-65535 and "all".
+                     Default is "all"
+     -funit          The unit where a lost signal is received to stop
+                     a trace.
+     -info           Free text to inform why a trace is started (70
+                     characters).
+     -lim            Lim number where trace is initiated. Unit trace
+                     can be made on "all"
+     -mask           Specifies what equipment positions within a 32-group
+                     that should be included in the trace.
+     -mgw            The hardware signalling position to trace on.
+                     Position entered as mgw will trace on internal
+                     switch signals to fictive multiple numbers on
+                     LSU/DSU
+     -modify         The stated tri is modified regarding sorting
+                     and rotate."all" modifies tri 1 to 15
+     -nodecode       Do not print signal data in decoded (human readable)
+                     form.
+     -print          The stated tri is printed.
+                     Print of 0 is printing the history log.
+                     Print can also be done on a started trace.
+     -remove         The stated tri is removed. "all" removes trace
+                     individuals 1 to 15 (not number 0).
+     -rotate         States if the trace shall stop when buffer is
+                     full or overwrite the first entries.
+     -sendalarm      Send alarm when trace hits stop by fault, servicecode
+                     or trigsignal. Alarm 1:51 (Trace stopped.) is
+                     used to inform user.
+                     yes/no or empty data. Empty data = yes.
+     -show           What type of information is printed out of the
+                     signals. Values:full(f), small(s), head(h), compact(c),
+                     or a digit(*)
+     -signam         Message name that will start a sequence trace,
+                     when entering in the stated lim and unit.
+     -signo          Message number that will start a sequence trace,
+                     when entering in the stated lim and unit.
+     -size           The number of traced messages that can be stored
+                     (1 to 10000).
+     -sortin         Signal numbers that shall be stored. "off" clears
+                     list.
+     -sortout        Signal numbers that are not stored. "off" clears
+                     list.
+     -ssignam        Stop on the trace if this signal name is received
+                     in stated unit.
+     -ssigno         Stop on the trace if this signal number is received
+                     in stated unit. Values: signal number or "off".
+     -start          The stated tri(s) are started. "all" starts tri
+                     1 to 15
+     -stop           The stated tri(s) are stopped. "all" stopped
+                     tri 1 to 15
+     -sunit          Stop on the trace if a stated signal is received
+                     in this unit.
+     -textlevel      What text information types, should be collected
+                     in the trace.
+                     Values:all(a)=0x7f, basic(b)=0x01, extra(e)=0x03,
+                     normal(n)=0x0b,
+                     verbose(v)=0x1b or a digit(*)
+                     bit0=basic, bit1=extended, bit2=events, bit3=state,
+                     bit4=diagnose, bit5=verbose, bit6=barf. Default
+                     is all(a) = 0x7f.
+     -to             Sequence number in trace to where the print will
+                     continue.
+     -totime         Date and time where the print will stop.
+     -unit           Unit name (PU-name) where trace is started.
+
+DESCRIPTION
+     *) used by experts
+
+     Trace can be initiated in different ways. Trace on unit, trace
+     on signal sequence or trace on directory number. To start a trace
+     the first command shall contain a directory number or a lim and
+     unit number, it may have additional parameters, the printout
+     returned shows the tri number assigned to your trace session.
+     If only lim and unit parameters are stated, a unit trace is started.
+     If message number is added to lim and unit a sequence trace is
+     started. If a directory number or equ is used a sequence trace
+     is started for the next call.
+     Tracing on mgw or bpos starts trace on the hw position (wilma
+     trace). Each signal is printed two times, if the equipment position
+     is initiated. On signals to hw the sw format is printed first
+     and on signals from hw the hw format is printed first. If hw
+     is not assigned on signals from hw only the first format is printed
+     as the signal is not forwarded anywhere.
+
+EXAMPLES
+     DIRECTORY TRACE
+          example% trace -dir 2000
+
+     UNIT TRACE
+          example% trace -lim 66 -unit CMP
+
+     SEQUENCE TRACE
+          example% trace -lim 1 -unit CMP -signo 33
+
+     START TRACE
+          example% trace -start 2
+
+     STOP TRACE
+          example% trace -stop 2
+
+     PRINT TRACE
+          example% trace -print 2
+
+     PRINT TRACE WITH FROMTIME PARAMETER SPECIFIED
+          example% trace -print 2 -fromtime "2013-07-01 12:45:00 (CEST)"
+
+     REMOVE TRACE
+          example% trace -remove 2
+
+NOTES
+     "trace -print 0" prints diagnostic history log
+     In most parameters, different notations for input can be used.
+     Decadic notation starts with a digit, octal with "0" and hexadecimal
+     values with "0x"
+     "trace -attach X" prints data as signals arrive from the traced
+     object. This can create LOTS of signals in the system, so be
+     careful when selecting targets.
+     Attach or print when trace is started on LOGGER should not be
+     done as it will give circular printouts, i.e. the printout will
+     start to print the printsignals.
+     Due to signalling restrictions trace -attach on all lims are
+     only allowed on for history log. If attaching any other trace
+     individual the user should log on to the attached lim.Trace "all"
+     can be cleared, stopped and (re)started by adding servicecodes:
+     SC-190 to clear, SC-191 to stop and SC-192 (re)start
+
