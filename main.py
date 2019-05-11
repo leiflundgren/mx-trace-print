@@ -13,6 +13,7 @@ from settings import Settings
 from tools import trace
 from executor import Executor
 from parse_display import ParseDisplayOutput
+import tools
 
 class Main:
 
@@ -153,8 +154,8 @@ Switches not used by this program should be passed down to trace
 
         save_args = self.command_line.save
         if not save_args is None:
-            prefix=self.command_line.file_prefix or self.settings.save_prefix
-            postfix=self.command_line.file_postfix or self.settings.save_postfix
+            prefix=tools.expand_string( self.command_line.file_prefix or self.settings.file_prefix)
+            postfix=tools.expand_string(self.command_line.file_postfix or self.settings.file_postfix)
             trace(3, "save " + save_args , ", prefix=" , prefix , ", postfix=" , postfix)
             self.call_display()
             self.call_save(save_args.split(','), prefix, postfix)

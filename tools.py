@@ -90,3 +90,18 @@ def pretty(value,htchar="\t",lfchar="\n",indent=0):
     return (type(value)is list and "[%s%s%s]" or "(%s%s%s)")%(",".join(["%s%s%s"%(lfchar,htchar*(indent+1),pretty(item,htchar,lfchar,indent+1)) for item in value]),lfchar,(htchar*indent))
   else:
     return repr(value)
+
+def expand_string(s:[str]) -> str:
+    s = os.path.expandvars(s)
+    dt = s.find('${DATETIME}')
+    if dt >= 0:
+        s = s[:dt] + datetime.datetime.now().strftime("%Y%m%d_%H%M%S") + s[dt+11:]
+    dt = s.find('${DATE}')
+    if dt >= 0:
+        s = s[:dt] + datetime.datetime.now().strftime("%Y%m%d") + s[dt+7:]
+    dt = s.find('${TIME}')
+    if dt >= 0:
+        s = s[:dt] + datetime.datetime.now().strftime("%H%M%S") + s[dt+7:]
+
+    return s
+    
