@@ -354,11 +354,12 @@ def _tools(__name__):
         except UnicodeEncodeError:
             print(msg.encode('cp850', errors='replace'), file=handle)
     
+    
     def pretty(value,htchar="\t",lfchar="\n",indent=0):
       if type(value) in [dict]:
-        return "{%s%s%s}"%(",".join(["%s%s%s: %s"%(lfchar,htchar*(indent+1),repr(key),pretty(value[key],htchar,lfchar,indent+1))for key in value]),lfchar,(htchar*indent))
+        return "{%s%s%s}"%(",".join(["%s%s%s: %s"%(lfchar,htchar*(indent+1),repr(key),pretty(value[key],htchar,lfchar,indent+1)) for key in value]),lfchar,(htchar*indent))
       elif type(value) in [list,tuple]:
-        return (type(value)is list and"[%s%s%s]"or"(%s%s%s)")%(",".join(["%s%s%s"%(lfchar,htchar*(indent+1),pretty(item,htchar,lfchar,indent+1))for item in value]),lfchar,(htchar*indent))
+        return (type(value)is list and "[%s%s%s]" or "(%s%s%s)")%(",".join(["%s%s%s"%(lfchar,htchar*(indent+1),pretty(item,htchar,lfchar,indent+1)) for item in value]),lfchar,(htchar*indent))
       else:
         return repr(value)
     
@@ -473,6 +474,10 @@ def _parse_display(__name__):
     
         def __str__(self) -> str:
             return  "\n".join( [str(i) for i in self.individuals ] )
+    
+        @property
+        def is_valid(self) -> bool:
+            return not self.individuals is None
     
         @property
         def first_trace(self) -> str:
@@ -888,7 +893,7 @@ def _main(__name__):
         def __init__(self, program_name, argv:[str], settings:'Settings' = None) -> None:
             self.command_line = CommandLineParser(program_name, argv)
             self.settings = settings or Main.find_settings(self.command_line.settings_file)
-            self.parsed_display = 'ParseDisplayOutput' = None # ("")
+            self.parsed_display = ParseDisplayOutput("")
             self.command_generator = CommandGenerator(self.parsed_display, self.settings)
     
         def set_parsed_display(self, val:ParseDisplayOutput):
@@ -926,7 +931,7 @@ def _main(__name__):
                 
     
         def main(self) -> str:
-            trace(7, "main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.original_args)+ " ]")
+            trace(7, "main method: " + self.command_line.program_name + " args: [ " + ", ".join(self.command_line.argv)+ " ]")
     
             display_settings = self.command_line.display_settings
             if  display_settings:
@@ -988,8 +993,8 @@ def _main(__name__):
     
             save_args = self.command_line.save
             if not save_args is None:
-                prefix=self.command_line.file_prefix or self.settings.save_prefix
-                postfix=self.command_line.file_postfix or self.settings.save_postfix
+                prefix=self.command_line.file_prefix or self.settings.file_prefix
+                postfix=self.command_line.file_postfix or self.settings.file_postfix
                 trace(3, "save " + save_args , ", prefix=" , prefix , ", postfix=" , postfix)
                 self.call_display()
                 self.call_save(save_args.split(','), prefix, postfix)

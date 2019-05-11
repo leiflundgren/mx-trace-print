@@ -1,0 +1,14 @@
+{
+    "trace_cmd": "trace",
+    "default_textlevel": "full",
+    "gangs": {
+        "usual": ["SIPLP", "RMP", "CMP"],
+        "csta": ["CSTServer", "ISUS", "CMP", "RMP", "SIPLP"],
+        "unusual": ["SIPLP", "MADEUP", "CMP"]        
+    },
+    "file_prefix": "trace_mx_",
+    "file_postfix": ".log",
+    "file_separators": "-_/=",
+    "debug_trace_level": 7,
+    "debug_trace_commands": 6
+}

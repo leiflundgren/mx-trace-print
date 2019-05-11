@@ -29,7 +29,7 @@ def modulize(module_name, dependencies=[]):
 
 ##===========================================================================##
 
-@modulize(u'command_line_parser')
+@modulize('command_line_parser')
 def _command_line_parser(__name__):
     ##----- Begin command_line_parser.py -----------------------------------------##
     
@@ -272,7 +272,7 @@ def _command_line_parser(__name__):
     ##----- End command_line_parser.py -------------------------------------------##
     return locals()
 
-@modulize(u'tools')
+@modulize('tools')
 def _tools(__name__):
     ##----- Begin tools.py -------------------------------------------------------##
     import sys
@@ -361,18 +361,19 @@ def _tools(__name__):
         except UnicodeEncodeError:
             print >>handle, msg.encode(u'cp850', errors=u'replace')
     
+    
     def pretty(value,htchar=u"\t",lfchar=u"\n",indent=0):
       if type(value) in [dict]:
-        return u"{%s%s%s}"%(u",".join([u"%s%s%s: %s"%(lfchar,htchar*(indent+1),repr(key),pretty(value[key],htchar,lfchar,indent+1))for key in value]),lfchar,(htchar*indent))
+        return u"{%s%s%s}"%(u",".join([u"%s%s%s: %s"%(lfchar,htchar*(indent+1),repr(key),pretty(value[key],htchar,lfchar,indent+1)) for key in value]),lfchar,(htchar*indent))
       elif type(value) in [list,tuple]:
-        return (type(value)is list andu"[%s%s%s]"oru"(%s%s%s)")%(u",".join([u"%s%s%s"%(lfchar,htchar*(indent+1),pretty(item,htchar,lfchar,indent+1))for item in value]),lfchar,(htchar*indent))
+        return (type(value)is list and u"[%s%s%s]" or u"(%s%s%s)")%(u",".join([u"%s%s%s"%(lfchar,htchar*(indent+1),pretty(item,htchar,lfchar,indent+1)) for item in value]),lfchar,(htchar*indent))
       else:
         return repr(value)
     
     ##----- End tools.py ---------------------------------------------------------##
     return locals()
 
-@modulize(u'parse_display')
+@modulize('parse_display')
 def _parse_display(__name__):
     ##----- Begin parse_display.py -----------------------------------------------##
     import io
@@ -482,6 +483,10 @@ def _parse_display(__name__):
             return  u"\n".join( [unicode(i) for i in self.individuals ] )
     
         @property
+        def is_valid(self):
+            return not self.individuals is None
+    
+        @property
         def first_trace(self):
             return self.individuals[0].get(u'First')
         @property
@@ -511,7 +516,7 @@ def _parse_display(__name__):
     ##----- End parse_display.py -------------------------------------------------##
     return locals()
 
-@modulize(u'settings')
+@modulize('settings')
 def _settings(__name__):
     ##----- Begin settings.py ----------------------------------------------------##
     import json
@@ -634,7 +639,7 @@ def _settings(__name__):
     ##----- End settings.py ------------------------------------------------------##
     return locals()
 
-@modulize(u'command_generator')
+@modulize('command_generator')
 def _command_generator(__name__):
     ##----- Begin command_generator.py -------------------------------------------##
     from parse_display import ParseDisplayOutput
@@ -809,7 +814,7 @@ def _command_generator(__name__):
     ##----- End command_generator.py ---------------------------------------------##
     return locals()
 
-@modulize(u'executor')
+@modulize('executor')
 def _executor(__name__):
     ##----- Begin executor.py ----------------------------------------------------##
     from tools import trace
@@ -845,7 +850,7 @@ def _executor(__name__):
     ##----- End executor.py ------------------------------------------------------##
     return locals()
 
-@modulize(u'main')
+@modulize('main')
 def _main(__name__):
     ##----- Begin main.py --------------------------------------------------------##
     #!/usr/bin/python
@@ -895,7 +900,7 @@ def _main(__name__):
         def __init__(self, program_name, argv, settings = None):
             self.command_line = CommandLineParser(program_name, argv)
             self.settings = settings or Main.find_settings(self.command_line.settings_file)
-            self.parsed_display = u'ParseDisplayOutput' = None # ("")
+            self.parsed_display = ParseDisplayOutput(u"")
             self.command_generator = CommandGenerator(self.parsed_display, self.settings)
     
         def set_parsed_display(self, val):
@@ -995,8 +1000,8 @@ def _main(__name__):
     
             save_args = self.command_line.save
             if not save_args is None:
-                prefix=self.command_line.file_prefix or self.settings.save_prefix
-                postfix=self.command_line.file_postfix or self.settings.save_postfix
+                prefix=self.command_line.file_prefix or self.settings.file_prefix
+                postfix=self.command_line.file_postfix or self.settings.file_postfix
                 trace(3, u"save " + save_args , u", prefix=" , prefix , u", postfix=" , postfix)
                 self.call_display()
                 self.call_save(save_args.split(u','), prefix, postfix)
