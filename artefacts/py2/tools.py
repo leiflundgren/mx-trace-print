@@ -21,12 +21,17 @@ def open_read_file(name, mode=u"r", encoding=u'iso-8859-1'):
     return open(name, mode, encoding=encoding)
 
 
+def print_str(x, f=sys.stdout):    
+    f.write(x)
+    f.write(u'\n')
+
+
 tracelevel = 4
 log_handle = None
 
-def trace(level, *args, **_3to2kwargs):
-    if 'file' in _3to2kwargs: file = _3to2kwargs['file']; del _3to2kwargs['file']
-    else: file = sys.stdout
+file=sys.stdout
+
+def trace(level, *args):
     def fix_linendings(s):
         if os.linesep == u'\n':
             return s
@@ -80,12 +85,16 @@ def trace(level, *args, **_3to2kwargs):
         msg += mystr(thing)
 
     msg = msg.rstrip()
-    handle = file if not file is None else ( sys.stderr if log_handle is None  else log_handle )
 
-    try:
-        print >>handle, msg
-    except UnicodeEncodeError:
-        print >>handle, msg.encode(u'cp850', errors=u'replace')
+    file.write( msg )
+
+    # handle = file if not file is None else ( sys.stderr if log_handle is None  else log_handle )
+    # try:
+    #     print(msg, file=handle)
+    # except TypeError:
+    #     file.write( handle, msg )
+    # except UnicodeEncodeError:
+    #     os.write( handle, msg.encode('cp850', errors='replace'))
 
 
 def pretty(value,htchar=u"\t",lfchar=u"\n",indent=0):

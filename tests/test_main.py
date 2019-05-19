@@ -44,7 +44,8 @@ class TestMain(unittest.TestCase):
 
         output = out.getvalue().strip()
         print(output)
-        self.assertTrue(output.find("-hello world") >= 0)
+        self.assertTrue(output.find("-hello") >= 0)
+        self.assertTrue(output.find("world") >= 0)
         self.assertTrue(output.find(" Version") >= 0)
         self.assertTrue(output.find(" Trace ind:  1") >= 0)
         self.assertTrue(output.find(" Unit name: SIPLP") >= 0)

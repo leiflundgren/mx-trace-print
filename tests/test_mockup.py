@@ -10,6 +10,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 import trace_mockup 
+from tools import print_str
 
 @contextmanager
 def captured_output():
@@ -40,10 +41,13 @@ class TestMockup(unittest.TestCase):
             trace_mockup.TraceMockup(['fake_progname', '-display', '-mxver', '7'])
         errout = err.getvalue()
         if not errout is None and len(errout) > 0:
-            print(errout, file=sys.stderr)
+            print_str(errout, f=sys.stderr)
 
-        output = out.getvalue().strip()
-        print(output)
+        output = out.getvalue()
+        print_str('#### output:')
+        print_str(output)
+        l = len(output) 
+        self.assertLess(10, l, 'Had expected more than len==10 for output')
         self.assertTrue(self.find_keyword(output, "\n Version:"))
     
     def test_print_id(self):
@@ -51,11 +55,13 @@ class TestMockup(unittest.TestCase):
             trace_mockup.TraceMockup(['fake_progname', '-print', '3', '-mxver', '7'])
         errout = err.getvalue()
         if not errout is None and len(errout) > 0:
-            print(errout, file=sys.stderr)
+            print_str(errout, f=sys.stderr)
 
-        output = out.getvalue().strip()
-        print(output)
-        self.assertTrue(self.find_keyword(output, "\n Version:"))
+        output = out.getvalue()
+        print_str('#### output:')
+        print_str(output)
+        self.assertLess(10, len(output), 'Had expected more than len==10 for output')
+        self.assertTrue(self.find_keyword(output, " Version:"))
         self.assertEqual("3", self.find_keyword(output, "\n Trace ind:"))
         self.assertEqual("CMP", self.find_keyword(output, " Unit name:"))
 
@@ -69,12 +75,13 @@ class TestMockup(unittest.TestCase):
             trace_mockup.TraceMockup(['fake_progname', '-print', '1', '-mxver', '7'])
         errout = err.getvalue()
         if not errout is None and len(errout) > 0:
-            print(errout, file=sys.stderr)
+            print_str(errout, f=sys.stderr)
             self.fail("Something on stderr")
 
-        output = out.getvalue().strip()
-        print(output)
-        self.assertTrue(self.find_keyword(output, "\n Version:"))
+        output = out.getvalue()
+        print_str('#### output:')
+        print_str(output)
+        self.assertTrue(self.find_keyword(output, " Version:"))
         self.assertEqual("1", self.find_keyword(output, "\n Trace ind:"))
         self.assertEqual("SIPLP", self.find_keyword(output, " Unit name:"))
 

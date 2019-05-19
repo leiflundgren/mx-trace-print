@@ -18,7 +18,11 @@ class Test_Tools(unittest.TestCase):
         return tools.trace(lvl, argv)
 
     def setUp(self):
-        pass
+        if  not 'USERNAME' in os.environ :
+            os.environ['USERNAME'] = 'N/A'
+        if  not 'NON_EXISTING_ENV' in os.environ :
+            os.environ['NON_EXISTING_ENV'] = 'yes'
+        
 
 
     def test_expand_string(self):
@@ -27,7 +31,9 @@ class Test_Tools(unittest.TestCase):
             self.assertNotEqual(s, expanded)
         self.assertEqual('', tools.expand_string(''))
         self.assertEqual('hej', tools.expand_string('hej'))
-        
+        self.assertTrue("USERNAME" in os.environ)
+        self.assertTrue("NON_EXISTING_ENV" in os.environ)
+
         assertExpandedSomething('prefix_${USERNAME}_end')
         #assertExpandedSomething('prefix_$USERNAME_end')
         assertExpandedSomething('prefix_${DATETIME}_end')

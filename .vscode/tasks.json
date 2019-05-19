@@ -87,7 +87,26 @@
             ]
         },
         {
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "label": "prepare testfolder py 3to2",
             "dependsOn": "prepare folder py 3to2",
+            "type": "shell",
+            "command": "cp",
+            "args": [
+                "-v",
+                "tests/*.py",
+                "artefacts/py2/tests"
+            ]
+        },
+        {
+            "dependsOn": "prepare testfolder py 3to2",
             "label": "py3to2",
             "type": "shell",
             "command": "python",
@@ -96,7 +115,8 @@
                 "--no-diffs",
                 "--write",
                 "--nobackups",
-                "artefacts/py2/*py"
+                "artefacts/py2/*py",
+                "artefacts/py2/tests/*py"
             ],
             "group": {
                 "kind": "build",

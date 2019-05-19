@@ -18,10 +18,17 @@ def open_read_file(name, mode:str="r", encoding='iso-8859-1') -> io.TextIOBase:
     return open(name, mode, encoding=encoding)
 
 
+def print_str(x, f=sys.stdout):    
+    f.write(x)
+    f.write('\n')
+
+
 tracelevel = 4
 log_handle = None
 
-def trace(level:int, *args, file=sys.stdout):
+file=sys.stdout
+
+def trace(level:int, *args):
     def fix_linendings(s: str) -> str:
         if os.linesep == '\n':
             return s
@@ -75,12 +82,16 @@ def trace(level:int, *args, file=sys.stdout):
         msg += mystr(thing)
 
     msg = msg.rstrip()
-    handle = file if not file is None else ( sys.stderr if log_handle is None  else log_handle )
 
-    try:
-        print(msg, file=handle)
-    except UnicodeEncodeError:
-        print(msg.encode('cp850', errors='replace'), file=handle)
+    file.write( msg )
+
+    # handle = file if not file is None else ( sys.stderr if log_handle is None  else log_handle )
+    # try:
+    #     print(msg, file=handle)
+    # except TypeError:
+    #     file.write( handle, msg )
+    # except UnicodeEncodeError:
+    #     os.write( handle, msg.encode('cp850', errors='replace'))
 
 
 def pretty(value,htchar="\t",lfchar="\n",indent=0):

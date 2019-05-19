@@ -7,11 +7,13 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from tools import trace
+from tools import print_str
 from command_line_parser import CommandLineParser
+
 
 class TraceMockup:
     def __init__(self, argv:[str]):
-        print(" ".join(argv))
+        trace(0, argv)
         self.args = CommandLineParser(argv)
         self.mxver = int(self.args.get_arg('mxver', '0'))
         if self.mxver == 6:
@@ -35,18 +37,18 @@ class TraceMockup:
         elif not print_args is None:
             self.print_print(print_args)
         else:
-            print("args: " + " ".join(sys.argv[1:]))
+            print_str("args: " + " ".join(sys.argv[1:]))
             pass
 
     def print_help(self):
-        print(self.readfile(self.help_file))
+        sys.stdout.write(self.readfile(self.help_file))
 
     def print_display(self):
         disp_str = self.readfile(self.display_file)
         cc = self.args.get_arg('call-count', 0)
         if int(cc) < 3:
-            print(disp_str)
-            return
+            sys.stdout.write(disp_str)
+            return disp_str
 
         # add MADEUP as extra module
 
@@ -54,15 +56,15 @@ class TraceMockup:
         has_found = False
         for line in disp_str.splitlines():
             if not has_found and line.endswith(key):
-                print(line[:len(line)-len(key)] + 'State: stopped     , Stored:     75, Size per lim: 5000')
-                print(' First: 2019-01-22 16:16:01 (CET) Last: 2019-01-22 16:16:19 (CET)')
-                print(' Type     : unit-trace      , Rotating: on , Textlevel: normal')
-                print(' Lim no   :   1, Unit no: 4711, Unit name: MADEUP')
-                print(' Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin')
-                print(' Trace stopped by : command (manually stopped)')
+                print_str(line[:len(line)-len(key)] + 'State: stopped     , Stored:     75, Size per lim: 5000')
+                print_str(' First: 2019-01-22 16:16:01 (CET) Last: 2019-01-22 16:16:19 (CET)')
+                print_str(' Type     : unit-trace      , Rotating: on , Textlevel: normal')
+                print_str(' Lim no   :   1, Unit no: 4711, Unit name: MADEUP')
+                print_str(' Time mark: 2019-01-22 16:16:32 (CET), by user: mxone_admin')
+                print_str(' Trace stopped by : command (manually stopped)')
                 has_found = True
             else:        
-                print(line)
+                print_str(line)
 
     def readfile(self, file:str) -> str:
         with open(file, 'r', encoding='iso-8859-1') as f:
@@ -87,7 +89,7 @@ class TraceMockup:
 
         ouput = disp_str.replace(' Trace ind:  1', ' Trace ind:  ' + str(n))
         ouput = ouput.replace(' Unit name: SIPLP', ' Unit name: ' + unit_name)
-        print(ouput)
+        sys.stdout.write(ouput)
         return ouput
 
     def parse_command_line(self, argv:[str]) -> None:
