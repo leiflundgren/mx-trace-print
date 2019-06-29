@@ -36,11 +36,11 @@ class TestZip(unittest.TestCase):
     "debug_trace_commands": 6
 }"""        
         self.settings = TestSettings(settings_json)
-        self.tempfolder = tempfile.TemporaryDirectory(u'__test-mxtrace')
+        self.tempfolder = tempfile.mkdtemp(prefix=u'__test-mxtrace')
         
     # issues save command, checks 
     def run_zip(self, save_arg, expected_file_count):
-        folder = os.path.join(self.tempfolder.name, self._testMethodName)
+        folder = os.path.join(self.tempfolder, self._testMethodName)
         trace(5, u'Creating ', folder)
         os.mkdir(folder)
 
@@ -61,7 +61,7 @@ class TestZip(unittest.TestCase):
         try:
             print u'=================================='
             print u'== test_save_a_id'
-            print u' temp folder: ' + self.tempfolder.name
+            print u' temp folder: ' + self.tempfolder
             print u'=================================='
             folder = self.run_zip(u'1', 1)
             self.assertFileInOutput(folder, u'SIPLP')
@@ -72,7 +72,7 @@ class TestZip(unittest.TestCase):
         try:
             print u'=================================='
             print u'== test_print_b_indv'
-            print u' temp folder: ' + self.tempfolder.name
+            print u' temp folder: ' + self.tempfolder
             print u'=================================='
             folder = self.run_zip(u'SIPLP', 1)
             self.assertFileInOutput(folder, u'SIPLP')
@@ -83,7 +83,7 @@ class TestZip(unittest.TestCase):
         try:
             print u'=================================='
             print u'== test_print_c_gang'
-            print u' temp folder: ' + self.tempfolder.name
+            print u' temp folder: ' + self.tempfolder
             print u'=================================='
             folder = self.run_zip(u'usual', 3)
             self.assertFileInOutput(folder, u'SIPLP')
