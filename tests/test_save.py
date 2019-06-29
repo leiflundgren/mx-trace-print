@@ -34,11 +34,11 @@ class TestSave(unittest.TestCase):
     "debug_trace_commands": 6
 }"""        
         self.settings = TestSettings(settings_json)
-        self.tempfolder = tempfile.TemporaryDirectory('test-mxtrace')
+        self.tempfolder = tempfile.mkdtemp(prefix='test-mxtrace')
         
     # issues save command, checks 
     def run_save(self, save_arg:str, expected_file_count:int) -> str:
-        folder = os.path.join(self.tempfolder.name, self._testMethodName)
+        folder = os.path.join(self.tempfolder, self._testMethodName)
         trace(5, 'Creating ', folder)
         os.mkdir(folder)
 
@@ -63,7 +63,7 @@ class TestSave(unittest.TestCase):
         try:
             print('==================================')
             print('== test_save_a_id')
-            print(' temp folder: ' + self.tempfolder.name)
+            print(' temp folder: ' + self.tempfolder)
             print('==================================')
             folder = self.run_save('1', 1)
             self.assertFileInOutput(folder, 'SIPLP')
@@ -74,7 +74,7 @@ class TestSave(unittest.TestCase):
         try:
             print('==================================')
             print('== test_print_b_indv')
-            print(' temp folder: ' + self.tempfolder.name)
+            print(' temp folder: ' + self.tempfolder)
             print('==================================')
             folder = self.run_save('SIPLP', 1)
             self.assertFileInOutput(folder, 'SIPLP')
@@ -85,7 +85,7 @@ class TestSave(unittest.TestCase):
         try:
             print('==================================')
             print('== test_print_c_gang')
-            print(' temp folder: ' + self.tempfolder.name)
+            print(' temp folder: ' + self.tempfolder)
             print('==================================')
             folder = self.run_save('usual', 3)
             self.assertFileInOutput(folder, 'SIPLP')
