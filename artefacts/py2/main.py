@@ -153,7 +153,7 @@ Switches not used by this program should be passed down to trace
             self.call_display()
             extra_args = self.command_line.print_extra_args().argv
             printout = self.call_print([print_args], extra_args)
-            print printout
+            sys.stdout.write(printout) 
             return printout
 
         save_args = self.command_line.save

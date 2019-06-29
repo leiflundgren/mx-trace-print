@@ -25,5 +25,5 @@ class Executor:
 
     @property
     def str_result(self):
-        return self.result.decode() if isinstance(self.result, bytes) else self.result
+        return str(self.result.decode() if isinstance(self.result, bytes) else self.result)
 

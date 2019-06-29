@@ -29,9 +29,11 @@ def print_str(x, f=sys.stdout):
 tracelevel = 4
 log_handle = None
 
-file=sys.stdout
+log_output=sys.stdout
 
-def trace(level, *args):
+def trace(level, *args, **_3to2kwargs):
+    if 'file' in _3to2kwargs: file = _3to2kwargs['file']; del _3to2kwargs['file']
+    else: file = log_output
     def fix_linendings(s):
         if os.linesep == u'\n':
             return s

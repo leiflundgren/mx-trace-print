@@ -26,5 +26,5 @@ class Executor(object):
 
     @property
     def str_result(self):
-        return self.result.decode() if isinstance(self.result, str) else self.result
+        return unicode(self.result.decode() if isinstance(self.result, str) else self.result)
 

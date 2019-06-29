@@ -26,9 +26,9 @@ def print_str(x, f=sys.stdout):
 tracelevel = 4
 log_handle = None
 
-file=sys.stdout
+log_output=sys.stdout
 
-def trace(level:int, *args):
+def trace(level:int, *args, file=log_output):
     def fix_linendings(s: str) -> str:
         if os.linesep == '\n':
             return s

@@ -67,7 +67,12 @@ class TraceMockup:
                 print_str(line)
 
     def readfile(self, file:str) -> str:
-        with open(file, 'r', encoding='iso-8859-1') as f:
+        try:
+            with open(file, 'r', encoding='iso-8859-1') as f:
+                return str(f.read())
+        except IOError:
+            pass
+        with open(os.path.join("tests", file), 'r', encoding='iso-8859-1') as f:
             return str(f.read())
 
     def print_print(self, arg:str) -> str:
